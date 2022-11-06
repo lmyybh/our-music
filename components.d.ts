@@ -27,6 +27,7 @@ declare module '@vue/runtime-core' {
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     IEpAddLocation: typeof import('~icons/ep/add-location')['default']
+    IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpHeadset: typeof import('~icons/ep/headset')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

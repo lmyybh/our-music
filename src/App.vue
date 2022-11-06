@@ -36,7 +36,12 @@
                   :size="30"
                     src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
                   />
-                  <span>未登录</span>
+                  <span>
+                    未登录
+                    <el-icon style="margin-left: 0;">
+                      <i-ep-arrow-down />
+                    </el-icon>
+                  </span>
                 </div>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -89,7 +94,7 @@
   align-items: center;
 
   span {
-    margin-left: 5px;
+    margin-left: 8px;
     color: white;
     font-size: small;
   }
