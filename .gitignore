@@ -17,3 +17,5 @@ coverage
 /cypress/videos/
 /cypress/screenshots/
 .vscode/*
+
+R-C.png
