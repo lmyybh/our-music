@@ -1,15 +1,18 @@
 <script setup lang="ts">
-  import Header from './views/Header.vue'
+  import HeaderView from './views/HeaderView.vue'
+  import AsideView from './views/AsideView.vue'
 </script>
 
 <template>
   <div id="main">
     <el-container class="container">
       <el-header height="50px" style="background-color: #c62f2f;">
-        <Header />
+        <HeaderView />
       </el-header>
       <el-container class="down-container">
-        <el-aside width="220px" class="aside">Aside</el-aside>
+        <el-aside width="220px" class="aside">
+          <AsideView />
+        </el-aside>
         <el-main>Main</el-main>
       </el-container>
       <el-footer height="50px" class="footer">footer</el-footer>
