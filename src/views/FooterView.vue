@@ -7,19 +7,24 @@
 <template>
     <div class="footer-view">
         <el-row align="middle" style="height: 100%;">
-            <el-col :span="3">
-                <el-button color="#e83c3c" circle style="width:32px;height:32px;margin:0 10px 0 10px;">
+            <el-col :span="4">
+                <el-button color="#e83c3c" circle style="width:26px;height:26px;">
+                    <el-icon :size="8">
+                        <svg t="1667812984284" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2084" width="200" height="200"><path d="M96.173558 3.44649h191.906985a31.984498 31.984498 0 0 1 31.984497 31.79259v386.852497L904.453794 10.579032l11.194574-7.90017A31.85656 31.85656 0 0 1 959.754991 32.072615v960.270569a31.888544 31.888544 0 0 1-44.106623 29.361768l-11.162589-7.836202L320.06504 602.324221v386.852497a31.984498 31.984498 0 0 1-31.984497 31.792591H96.173558a31.984498 31.984498 0 0 1-31.984498-31.792591V35.23908a31.984498 31.984498 0 0 1 31.984498-31.79259z" p-id="2085"></path></svg>
+                    </el-icon>
+                </el-button>
+                <el-button color="#e83c3c" circle style="width:32px;height:32px;margin-left: 20px;">
                     <el-icon :size="18">
                         <svg t="1667808064489" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4958" width="200" height="200"><path d="M755.2 544L390.4 874.666667c-17.066667 14.933333-44.8 14.933333-59.733333-2.133334-6.4-8.533333-10.666667-19.2-10.666667-29.866666v-661.333334c0-23.466667 19.2-42.666667 42.666667-42.666666 10.666667 0 21.333333 4.266667 27.733333 10.666666l362.666667 330.666667c17.066667 14.933333 19.2 42.666667 2.133333 59.733333 2.133333 2.133333 0 2.133333 0 4.266667z" p-id="4959"></path></svg>
                     </el-icon>
                 </el-button>
-                <el-button color="#e83c3c" circle style="width:26px;height:26px;">
+                <el-button color="#e83c3c" circle style="width:26px;height:26px;margin-left: 20px;">
                     <el-icon :size="8">
                         <svg t="1667807876460" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3295" width="200" height="200"><path d="M927.803661 3.406845h-191.916935a31.986156 31.986156 0 0 0-31.986156 31.79424v386.872556L119.449527 10.539758 108.286359 2.639178A31.858211 31.858211 0 0 0 64.17745 32.034455v960.320361a31.890198 31.890198 0 0 0 44.108909 29.363292l11.131182-7.836609L703.90057 602.31563v386.872557a31.986156 31.986156 0 0 0 31.986156 31.794239h191.916935a31.986156 31.986156 0 0 0 31.986156-31.794239V35.201085a31.986156 31.986156 0 0 0-31.986156-31.79424z" p-id="3296"></path></svg>
                     </el-icon>
                 </el-button>
             </el-col>
-            <el-col :span="17">
+            <el-col :span="16">
                 <ProgressBar :progress="52" />
             </el-col>
             <el-col :span="3" class="flex-row">
