@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import HeaderView from './views/HeaderView.vue'
   import AsideView from './views/AsideView.vue'
+  import FooterView from './views/FooterView.vue'
 </script>
 
 <template>
@@ -15,7 +16,9 @@
         </el-aside>
         <el-main>Main</el-main>
       </el-container>
-      <el-footer height="50px" class="footer">footer</el-footer>
+      <el-footer height="50px" class="footer">
+        <FooterView />
+      </el-footer>
     </el-container>
   </div>
 </template>
