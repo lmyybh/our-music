@@ -1,6 +1,8 @@
 <script setup>
     import {ref, onMounted, watch} from 'vue'
     import ProgressBar from "./ProgressBar.vue"
+    import {formatInterval} from '../assets/utils/utils.js'
+
     const props = defineProps({
         audioSrc: {
             type: String,
@@ -23,10 +25,10 @@
         
         audio.addEventListener('emptied', ()=>{
             progress.value = 0
-            preText.value = format(0)
+            preText.value = formatInterval(0)
         })
         audio.addEventListener('canplaythrough', ()=>{
-            postText.value = format(audio.duration)
+            postText.value = formatInterval(audio.duration)
             canPlayThrough = true
             
             if (firstOpen || isDraging || !playAfterDrag) {
@@ -40,7 +42,7 @@
                 return
             }
             progress.value = audio.currentTime * 100 / audio.duration
-            preText.value = format(audio.currentTime)
+            preText.value = formatInterval(audio.currentTime)
         })
         audio.addEventListener('playing', ()=>{
             isPlaying.value = true
@@ -65,8 +67,8 @@
         if (src === '') {
             isPlaying.value = false
             progress.value = 0
-            preText.value = format(0)
-            postText.value = format(0)
+            preText.value = formatInterval(0)
+            postText.value = formatInterval(0)
             return
         }
     }
@@ -114,13 +116,6 @@
 
     function changeVolume(pos) {
         audio.volume = pos
-    }
-
-    function format(duration) {
-        let seconds = Math.floor(duration)
-        let min = Math.floor(seconds/60)
-        let sec = seconds % 60
-        return min.toString().padStart(2, '0') + ':' + sec.toString().padStart(2, '0')
     }
 </script>
 

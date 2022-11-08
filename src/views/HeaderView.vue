@@ -1,7 +1,17 @@
 <script setup lang="ts">
     import {ref} from 'vue'
     import { Search } from '@element-plus/icons-vue'
-    const searchInput = ref('')
+    import { useRouter } from 'vue-router'
+    
+    const searchKey = ref('')
+    const router = useRouter()
+
+    function search() {
+      router.push({ 
+        name: 'search', 
+        params: { key: searchKey.value, pageNo: 1 } 
+      })
+    }
 </script>
 
 
@@ -19,11 +29,12 @@
           <el-col :span="5" :offset="8">
             <div>
               <el-input
-                v-model="searchInput"
+                v-model="searchKey"
                 size="small"
                 placeholder="搜索音乐"
                 :suffix-icon="Search"
                 style="background: #db1212;"
+                @keyup.enter.native="search"
               />
             </div>
           </el-col>

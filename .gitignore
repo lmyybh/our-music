@@ -18,5 +18,6 @@ coverage
 /cypress/screenshots/
 .vscode/*
 
+api.http
 R-C.png
 歌单.png

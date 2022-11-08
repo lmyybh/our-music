@@ -24,6 +24,9 @@ declare module '@vue/runtime-core' {
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElRow: typeof import('element-plus/es')['ElRow']
+    ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
@@ -38,6 +41,8 @@ declare module '@vue/runtime-core' {
     IEpDelete: typeof import('~icons/ep/delete')['default']
     IEpHeadset: typeof import('~icons/ep/headset')['default']
     IEpLove: typeof import('~icons/ep/love')['default']
+    MusicList: typeof import('./src/components/MusicList.vue')['default']
+    MusicPlayer: typeof import('./src/components/MusicPlayer.vue')['default']
     MusicProgress: typeof import('./src/components/MusicProgress.vue')['default']
     Progress: typeof import('./src/components/Progress.vue')['default']
     ProgressBar: typeof import('./src/components/ProgressBar.vue')['default']
@@ -45,5 +50,8 @@ declare module '@vue/runtime-core' {
     RouterView: typeof import('vue-router')['RouterView']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

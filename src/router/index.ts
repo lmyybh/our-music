@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AppView from '../App.vue'
+import HomeView from '../views/HomeView.vue'
+import SearchView from '../views/SearchView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,8 +8,13 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: AppView
-    }
+      component: HomeView
+    },
+    {
+      path: '/search/:key/:pageNo',
+      name: 'search',
+      component: SearchView
+    },
   ]
 })
 
