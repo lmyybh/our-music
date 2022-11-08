@@ -28,10 +28,11 @@
     for (let i=0; i < searchData.length; i++) {
         data[i] = {
             songmid: searchData[i].songmid,
-            name: searchData[i].songname,
+            songname: searchData[i].songname,
             singer: searchData[i].singer[0].name,
             albumname: searchData[i].albumname,
             interval: searchData[i].interval,
+            pay_play: searchData[i].pay.pay_play
         }
     }
     tabelData.value = data
