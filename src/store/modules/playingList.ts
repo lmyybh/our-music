@@ -29,6 +29,9 @@ export default {
             let keys = Array.from(state.musics.keys())
             return state.musics.get(keys[state.currentIdx]).songurl
         },
+        numMusics: (state) => {
+            return state.musics.size
+        }
     },
     mutations: {
         replaceMusics(state, listData) {
