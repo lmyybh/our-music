@@ -1,31 +1,22 @@
 <script setup lang="ts">
-    import {ref} from 'vue'
+    import {computed} from 'vue'
+    import { useStore} from 'vuex'
     import {CaretRight} from "@element-plus/icons-vue"
     import ProgressBar from "../components/ProgressBar.vue"
     import MusicPlayer from "../components/MusicPlayer.vue"
 
-    const audioIndex = ref(0)
-    let audioSrcs = [
-        'http://isure.stream.qqmusic.qq.com/C400003eqsoL1o9TvE.m4a?guid=2796982635&vkey=F7518BE4EDB902A83428668029CEAB16FD667417D290BAFB2FD10A4102164A32C336BEEAFDB0BC1EEBE1B87F9C9D1CD9DF802CAF60A0781D&uin=2831386909&fromtag=120032',
-        'http://isure.stream.qqmusic.qq.com/C400003LTSwp2aOIdu.m4a?guid=2796982635&vkey=90C36B9B83C6D4ED05950742ACAA0E83C412D288408BDB8E13207762FF378CD9033BB5F3FAC733F1EB00536C1F8911B81BB457F76C0244B7&uin=2831386909&fromtag=120032',
-    ]
+    const store = useStore()
 
-    function changeMusic(direction) {
-        audioIndex.value += direction
-        if (audioIndex.value < 0) {
-            audioIndex.value = 0
-        }
-        if (audioIndex.value >= audioSrcs.length) {
-            audioIndex.value = audioSrcs.length - 1
-        }
-    }
+    const audioSrc = computed(()=>{
+        return store.getters['playingList/currentUrl']
+    })
 </script>
 
 <template>
     <div class="footer-view">
         <el-row align="middle" style="height: 100%;">
             <el-col :span="23">
-                <MusicPlayer :audioSrc="audioSrcs[audioIndex]" @change-audio="changeMusic" />
+                <MusicPlayer :audioSrc="audioSrc" />
             </el-col>
             <el-col :span="1" class="flex-row-reverse">
                 <el-icon :size="20" color="#666666" class="lyric-icon">

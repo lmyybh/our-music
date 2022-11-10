@@ -1,7 +1,6 @@
 //引入axios
 import axios from 'axios'
-//引入qs
-import qs from 'qs'
+import { ElMessage } from 'element-plus'
 
 //axios定义
 axios.defaults.baseURL = '/api/';
@@ -10,12 +9,13 @@ axios.defaults.timeout = 3000;
 //axios.defaults.withCredentials = true;
 
 // http response 拦截器
-axios.interceptors.response.use(data => {
+axios.interceptors.response.use(response => {
     //==============  所有请求完成后都要执行的操作  ==================
-    if (data.status && data.status == 200 && data.data && data.data.status == 'error') {
-        return;
+    if (response.status && response.status == 200 && response.data && response.data.result == 200) {
+        ElMessage.error(response.data.errMsg);
+        return Promise.resolve({});
     }
-    return data;
+    return response;
 }, err => {
     return Promise.reject(err.response ? err.response.data : err);
 });

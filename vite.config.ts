@@ -39,7 +39,7 @@ export default defineConfig({
   },
   server: {
     host: '127.0.0.1',
-    port: 8000,
+    port: 8888,
     proxy: {
       '/api': {
         target: 'http://localhost:3300/',	//实际请求地址
