@@ -84,6 +84,9 @@ export default {
                 state.musics.set(data.songmid, music)
             })
         },
+        clearList(state) {
+            state.musics = initialMusicsMap()
+        },
         addSong(state, info) {
             state.musics.set(info.songmid, info)
         },

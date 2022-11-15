@@ -19,12 +19,15 @@
     }
     return data
   })
-
 </script>
 
 <template>
   <div class="playlist-view">
     <h2 class="playlist-title">{{'当前列表'}}</h2>
+    <div class="playlist-info">
+      <span style="font-size:small; color: #cfcfcf;">{{'总'+ tabelData.length +'首'}}</span>
+      <span class="clear-button" @click="store.commit('playingList/clearList')">清空列表</span>
+    </div>
     <MusicList 
       class="playlist-list" 
       :data="tabelData" 
@@ -47,6 +50,20 @@
 .playlist-title {
   font-weight: bolder;
   height: 50px;  
+}
+.playlist-info {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+
+  .clear-button {
+    color: #507daf;
+    cursor: pointer;
+  }
+
+  .clear-button:hover {
+    color: #0b58b0;
+  }
 }
 .playlist-list {
   height: 0;
