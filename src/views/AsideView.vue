@@ -1,4 +1,40 @@
-<script setup lang="ts">
+<script setup>
+  import {ref, computed, watch} from 'vue'
+  import {useStore} from 'vuex'
+  
+  import {songInfoReq} from '../assets/utils/api.js'
+
+  const musicInfo = ref(null)
+  const store = useStore()
+  
+  const songmid = computed(() => {
+    return store.getters['playingList/currentSongmid']
+  })
+
+  watch(songmid, (newMid) => {
+    if (newMid == '') {
+        musicInfo.value = null
+    } else {
+        getMusicInfo(newMid)
+    }
+  })
+
+  async function getMusicInfo(songmid) {
+    const data = await songInfoReq(songmid)
+    if (!data) {
+        musicInfo.value = null
+    } else {
+        const trackInfo = data.track_info
+        musicInfo.value = {}
+        musicInfo.value.songname = trackInfo.title
+        musicInfo.value.singer = trackInfo.singer[0].name
+        if (trackInfo.album.mid != '') {
+            musicInfo.value.coverSrc = `https://y.gtimg.cn/music/photo_new/T002R300x300M000${trackInfo.album.mid}.jpg`
+        } else {
+            musicInfo.value.coverSrc = `https://y.qq.com/music/photo_new/T001R300x300M000${trackInfo.singer[0].mid}.jpg`
+        }
+    }
+  }
 </script>
 
 <template>
@@ -20,13 +56,13 @@
             </el-menu>
         </div>
         <div class="music">
-            <el-row align="middle" style="width: 100%; height:100%; margin: 0;">
+            <el-row v-if="musicInfo" align="middle" style="width: 100%; height:100%; margin: 0;">
                 <el-col :span="6" class="cover">
-                    <el-image style="width: 46px; height: 46px" fit="fill" src="https://p1.ssl.qhmsg.com/dr/270_500_/t0133657d086cb7510c.jpg?size=480x320"/>
+                    <el-image style="width: 46px; height: 46px" fit="fill" :src="musicInfo.coverSrc" />
                 </el-col>
                 <el-col :span="16" class="info">
-                    <span class="music-name">夜曲</span>
-                    <span class="author-name">周杰伦</span>
+                    <span class="music-name">{{musicInfo.songname}}</span>
+                    <span class="author-name">{{musicInfo.singer}}</span>
                 </el-col>
                 <el-col :span="2" class="icons">
                     <el-icon :size="14" color="#666666" class="icon-button">
@@ -37,6 +73,7 @@
                     </el-icon>
                 </el-col>
             </el-row>
+            <span v-else>尚未选择音乐</span>
         </div>
     </div>
 </template>
@@ -80,6 +117,9 @@
 .music {
     height: 60px;
     border-top: 1px solid #d6d6d6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .cover {
     display: flex;

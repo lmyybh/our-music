@@ -11,5 +11,6 @@
 <style lang="scss">
 .main-view {
   height: 100%;
+  padding: 0 10px;
 }
 </style>

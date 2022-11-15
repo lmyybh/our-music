@@ -1,10 +1,34 @@
+import { ElMessage } from 'element-plus'
+
 const fields = ['songname', 'singer', 'songmid', 'songurl', 'albumname', 'interval', 'pay_play']
+
+function initialMusicsMap() {
+    let musics = new Map()
+    musics.set("empty", { songurl: '' })
+    return musics
+}
+
+function getUrl(musics, index) {
+    let keys = Array.from(musics.keys())
+    return musics.get(keys[index]).songurl
+}
+
+function findNextSongIndex(musics, currentIndex) {
+    let keys = Array.from(musics.keys())
+    for (let i = currentIndex; i < keys.length; i++) {
+        if (musics.get(keys[i]).songurl) {
+            return i
+        }
+    }
+    ElMessage.info('从当前位置到播放列表末尾，不存在可播放的歌曲')
+    return 0
+}
 
 export default {
     namespaced: true,
     state: () => {
         return {
-            musics: new Map(),
+            musics: initialMusicsMap(),
             // [
             //     {
             //         songname: '泡沫',
@@ -18,6 +42,8 @@ export default {
             // ],
             currentIdx: 0,
             wantToPlay: true,
+            showPlayingList: false,
+            toReload: false,
         }
     },
     getters: {
@@ -29,13 +55,27 @@ export default {
             let keys = Array.from(state.musics.keys())
             return state.musics.get(keys[state.currentIdx]).songurl
         },
+        currentInfo: (state) => {
+            if (state.currentIdx <= 0 || state.currentIdx >= state.musics.size) {
+                return
+            }
+
+            let keys = Array.from(state.musics.keys())
+            return state.musics.get(keys[state.currentIdx])
+        },
+        currentSongmid: (state) => {
+            if (state.currentIdx <= 0 || state.currentIdx >= state.musics.size) {
+                return ''
+            }
+            return Array.from(state.musics.keys())[state.currentIdx]
+        },
         numMusics: (state) => {
-            return state.musics.size
+            return state.musics.size - 1
         }
     },
     mutations: {
         replaceMusics(state, listData) {
-            state.musics.clear()
+            state.musics = initialMusicsMap()
             listData.forEach(data => {
                 let music = {}
                 fields.forEach((field) => {
@@ -51,25 +91,50 @@ export default {
             state.wantToPlay = true
             let idx = state.currentIdx + offset
             if (idx < 0) {
-                state.currentIdx = 0
+                idx = 0
             } else if (idx >= state.musics.size) {
-                state.currentIdx = state.musics.size - 1
-            } else {
-                state.currentIdx = idx
+                idx = state.musics.size - 1
             }
+
+            idx = findNextSongIndex(state.musics, idx)
+            if (idx == 0) {
+                state.wantToPlay = false
+            }
+
+            state.currentIdx = idx
         },
         selectSong(state, index) {
-            if (index < 0 || index >= state.musics.size) {
-                return
+            if (index < 0) {
+                index = 0
+            } else if (index >= state.musics.size) {
+                index = state.musics.size - 1
             }
-            state.currentIdx = index
-            console.log(state.musics, state.currentIdx)
+
+            let idx = findNextSongIndex(state.musics, index)
+            if (idx != index) {
+                ElMessage.info('当前歌曲不可播放，正在寻找下一首歌曲')
+            }
+
+            if (idx == 0) {
+                state.wantToPlay = false
+            }
+            state.currentIdx = idx
+
         },
         toPlay(state) {
             state.wantToPlay = true
         },
         toPause(state) {
             state.wantToPlay = false
+        },
+        switchList(state) {
+            state.showPlayingList = !state.showPlayingList
+        },
+        needReload(state) {
+            state.toReload = true
+        },
+        notNeedReload(state) {
+            state.toReload = false
         }
     }
 }

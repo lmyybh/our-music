@@ -37,6 +37,9 @@
             progress.value = 0
             preText.value = formatInterval(0)
         })
+        audio.addEventListener('ended', ()=>{
+            store.commit("playingList/cutSong", 1)
+        })
         audio.addEventListener('canplaythrough', ()=>{
             postText.value = formatInterval(audio.duration)
             canPlayThrough = true
@@ -67,6 +70,14 @@
 
     watch(() => props.audioSrc, (newSrc) => {
         changeAudio(newSrc)
+    })
+
+    watch(() => store.state.playingList.toReload, (newState) => {
+        if (newState) {
+            changeAudio('')
+            store.commit('playingList/notNeedReload')
+            changeAudio(props.audioSrc)
+        }
     })
 
     function changeAudio(src) {

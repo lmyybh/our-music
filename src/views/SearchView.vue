@@ -27,7 +27,7 @@
     let data = []
     for (let i=0; i < searchData.length; i++) {
         data[i] = {
-            id: i,
+            id: i+1, // 由于默认0位置是空链接，所以后移一位
             songmid: searchData[i].songmid,
             songname: searchData[i].songname,
             singer: searchData[i].singer[0].name,

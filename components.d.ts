@@ -9,6 +9,7 @@ declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
+    ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElContainer: typeof import('element-plus/es')['ElContainer']
@@ -41,6 +42,7 @@ declare module '@vue/runtime-core' {
     IEpDelete: typeof import('~icons/ep/delete')['default']
     IEpHeadset: typeof import('~icons/ep/headset')['default']
     IEpLove: typeof import('~icons/ep/love')['default']
+    IEpSearch: typeof import('~icons/ep/search')['default']
     MusicList: typeof import('./src/components/MusicList.vue')['default']
     MusicPlayer: typeof import('./src/components/MusicPlayer.vue')['default']
     MusicProgress: typeof import('./src/components/MusicProgress.vue')['default']

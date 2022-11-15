@@ -1,6 +1,5 @@
 <script setup lang="ts">
     import {ref} from 'vue'
-    import { Search } from '@element-plus/icons-vue'
     import { useRouter } from 'vue-router'
     
     const searchKey = ref('')
@@ -27,15 +26,9 @@
             </div>
           </el-col>
           <el-col :span="5" :offset="8">
-            <div>
-              <el-input
-                v-model="searchKey"
-                size="small"
-                placeholder="搜索音乐"
-                :suffix-icon="Search"
-                style="background: #db1212;"
-                @keyup.enter.native="search"
-              />
+            <div class="flex-row search-box">
+              <input :clearable="false" type="search" placeholder="search" v-model="searchKey" @keyup.enter.native="search">
+              <el-icon :size="12" @click="search" style="cursor: pointer;"><i-ep-search /></el-icon>
             </div>
           </el-col>
           <el-col :span="3">
@@ -69,6 +62,24 @@
 <style lang="scss">
 .header {
     height: 100%;
+}
+.search-box {
+  height: 25px;
+  background-color: white;
+  padding: 2px 10px;
+  border-radius: 15px;
+  justify-content: space-between;
+
+  input {
+    width: 90%;
+    height: 100%;
+    outline: none;
+    border: none;
+  }
+
+  input::-webkit-search-cancel-button {
+    display: none;
+  }
 }
 .flex-row {
     display: flex;

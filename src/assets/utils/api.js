@@ -32,4 +32,27 @@ export const songReq = async (songmids) => {
     } else {
         return;
     }
-}
+};
+
+export const songInfoReq = async (songmid) => {
+    const res = await get('/song', {
+        songmid: songmid
+    });
+    if (res) {
+        return res.data;
+    } else {
+        return;
+    }
+};
+
+export const albumInfoReq = async (albummid) => {
+    const res = await get('/album', {
+        albummid: albummid
+    });
+    console.log('res', res)
+    if (res) {
+        return res.data;
+    } else {
+        return;
+    }
+};
