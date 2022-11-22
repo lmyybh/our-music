@@ -9,15 +9,7 @@
   })
   
   const tabelData = computed(()=>{
-    let values = Array.from(store.state.playingList.musics.values())
-    let data = []
-    // 跳过第一条空链接，从 1 开始循环
-    for (let i = 1; i < values.length; i++) {
-      let info = {id: i}
-      Object.assign(info, values[i])
-      data[i-1] = info
-    }
-    return data
+    return store.getters['playingList/allSongs']
   })
 </script>
 

@@ -1,45 +1,12 @@
+import MusicList from '../utils/music'
 import { ElMessage } from 'element-plus'
-
-const fields = ['songname', 'singer', 'songmid', 'songurl', 'albumname', 'interval', 'pay_play']
-
-function initialMusicsMap() {
-    let musics = new Map()
-    musics.set("empty", { songurl: '' })
-    return musics
-}
-
-function getUrl(musics, index) {
-    let keys = Array.from(musics.keys())
-    return musics.get(keys[index]).songurl
-}
-
-function findNextSongIndex(musics, currentIndex) {
-    let keys = Array.from(musics.keys())
-    for (let i = currentIndex; i < keys.length; i++) {
-        if (musics.get(keys[i]).songurl) {
-            return i
-        }
-    }
-    ElMessage.info('从当前位置到播放列表末尾，不存在可播放的歌曲')
-    return 0
-}
+import { songReq } from '../../assets/utils/api.js'
 
 export default {
     namespaced: true,
     state: () => {
         return {
-            musics: initialMusicsMap(),
-            // [
-            //     {
-            //         songname: '泡沫',
-            //         singer: 'G.E.M. 邓紫棋',
-            //         songmid: '001X0PDf0W4lBq',
-            //         songurl: 'http://isure.stream.qqmusic.qq.com/C400000HjG8v1DTWRO.m4a?guid=2796982635&vkey=1AF671D294B676D845D6D5E258904EDD6C5C6666D319B9CC257B247E0B7FB462AC37D3784CECFB762973363A61514CEC6900DF646B693544&uin=&fromtag=120032',
-            //         albumname: 'Xposed',
-            //         interval: 258,
-            //         pay_play: false
-            //     }
-            // ],
+            musics: new MusicList(),
             currentIdx: 0,
             wantToPlay: true,
             showPlayingList: false,
@@ -47,97 +14,108 @@ export default {
         }
     },
     getters: {
-        currentUrl: (state) => {
-            if (state.currentIdx < 0 || state.currentIdx >= state.musics.size) {
-                return ''
-            }
-
-            let keys = Array.from(state.musics.keys())
-            return state.musics.get(keys[state.currentIdx]).songurl
+        currentInfo: (state: any) => {
+            return state.musics.getInfo(state.currentIdx)
         },
-        currentInfo: (state) => {
-            if (state.currentIdx <= 0 || state.currentIdx >= state.musics.size) {
-                return
-            }
-
-            let keys = Array.from(state.musics.keys())
-            return state.musics.get(keys[state.currentIdx])
+        currentUrl: (state: any) => {
+            return state.musics.getInfo(state.currentIdx).songurl
         },
-        currentSongmid: (state) => {
-            if (state.currentIdx <= 0 || state.currentIdx >= state.musics.size) {
-                return ''
-            }
-            return Array.from(state.musics.keys())[state.currentIdx]
+        currentSongmid: (state: any) => {
+            return state.musics.getInfo(state.currentIdx).songmid
         },
-        numMusics: (state) => {
-            return state.musics.size - 1
+        numMusics: (state: any) => {
+            return state.musics.length() - 1
+        },
+        allSongs: (state: any) => {
+            const songs = state.musics.getAllSongs()
+            return songs
         }
     },
+
     mutations: {
-        replaceMusics(state, listData) {
-            state.musics = initialMusicsMap()
-            listData.forEach(data => {
-                let music = {}
-                fields.forEach((field) => {
-                    music[field] = data[field]
-                })
-                state.musics.set(data.songmid, music)
-            })
+        clearList(state: any) {
+            state.musics.clear()
         },
-        clearList(state) {
-            state.musics = initialMusicsMap()
+        addSong(state: any, data: any) {
+            state.musics.append(data)
         },
-        addSong(state, info) {
-            state.musics.set(info.songmid, info)
+        replaceMusics(state: any, songmids: Array<string>, data: any) {
+            state.musics.replaceAll(songmids, data)
         },
-        cutSong(state, offset) {
+        cutSong(state: any, offset: number) {
             state.wantToPlay = true
             let idx = state.currentIdx + offset
             if (idx < 0) {
                 idx = 0
-            } else if (idx >= state.musics.size) {
-                idx = state.musics.size - 1
+            } else if (idx >= state.musics.length()) {
+                idx = state.musics.length() - 1
             }
 
-            idx = findNextSongIndex(state.musics, idx)
+            idx = state.musics.findNextMusicIndex(idx);
             if (idx == 0) {
+                ElMessage.info('从当前位置到播放列表末尾，不存在可播放的歌曲')
                 state.wantToPlay = false
             }
 
             state.currentIdx = idx
         },
-        selectSong(state, index) {
-            if (index < 0) {
-                index = 0
-            } else if (index >= state.musics.size) {
-                index = state.musics.size - 1
-            }
-
-            let idx = findNextSongIndex(state.musics, index)
+        selectSong(state: any, index: number) {
+            let idx = state.musics.findNextMusicIndex(index);
             if (idx != index) {
                 ElMessage.info('当前歌曲不可播放，正在寻找下一首歌曲')
             }
-
             if (idx == 0) {
+                ElMessage.info('从当前位置到播放列表末尾，不存在可播放的歌曲')
                 state.wantToPlay = false
             }
             state.currentIdx = idx
-
         },
-        toPlay(state) {
+        replaceSongs(state: any, data: any) {
+            const { allSongmids, reqSongs } = data
+            state.musics.replaceAll(allSongmids, reqSongs)
+        },
+        toPlay(state: any) {
             state.wantToPlay = true
         },
-        toPause(state) {
+        toPause(state: any) {
             state.wantToPlay = false
         },
-        switchList(state) {
+        switchList(state: any) {
             state.showPlayingList = !state.showPlayingList
         },
-        needReload(state) {
+        needReload(state: any) {
             state.toReload = true
         },
-        notNeedReload(state) {
+        notNeedReload(state: any) {
             state.toReload = false
+        }
+    },
+    actions: {
+        async requestSongs({ commit, state }: any, songsList: Array<any>) {
+            const allSongmids = songsList.map((song) => {
+                return song.songmid
+            })
+            const toReqSongmids = state.musics.findNotInMapSongmids(allSongmids)
+            let reqSongs = new Map();
+            // 存在需要新获取的歌曲时，获取信息
+            if (toReqSongmids.length > 0) {
+                const songurls = await songReq(toReqSongmids)
+                if (!songurls || Object.keys(songurls).length <= 0) {
+                    ElMessage.error('获取歌曲链接失败')
+                    return
+                } else {
+                    let reqSongs = new Map();
+                    for (let i = 0; i < songsList.length; i++) {
+                        let data = songsList[i]
+                        data.songurl = songurls[allSongmids[i]]
+                        reqSongs.set(allSongmids[i], data)
+                    }
+                    commit('replaceSongs', { allSongmids, reqSongs })
+                }
+            } else {
+                // 不存在需要新获取的歌曲时，直接按照顺序改变
+                commit('replaceSongs', { allSongmids, reqSongs })
+            }
         }
     }
 }

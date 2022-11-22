@@ -70,23 +70,13 @@
     }
   }
 
-  async function rowDblClick(info) {
-    const urls = await songReq(getAllSongmids(props.data))
-    if (!urls || Object.keys(urls).length <= 0) {
-      ElMessage.error('获取歌曲链接失败')
-    } else {
-      let res = []
-      for (let i = 0; i < props.data.length; i++) {
-        res[i] = {songurl: urls[props.data[i].songmid]}
-        Object.assign(res[i], props.data[i])
-      }
-      store.commit('playingList/replaceMusics', res)
+  function rowDblClick(info) {
+    store.dispatch('playingList/requestSongs', props.data)
+    .then(()=>{
       store.commit('playingList/selectSong', info.id)
       store.commit('playingList/needReload')
-      // if (store.state.playingList.currentIdx != info.id) {
-      // }
       store.commit('playingList/toPlay')
-    }
+    })
   }
 </script>
 

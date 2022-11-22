@@ -8,7 +8,7 @@ import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
+import { getEnv } from './config'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -42,7 +42,7 @@ export default defineConfig({
     port: 8888,
     proxy: {
       '/api': {
-        target: 'http://localhost:3300/',	//实际请求地址
+        target: getEnv('dev').target,	//实际请求地址
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       },

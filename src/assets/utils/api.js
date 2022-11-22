@@ -24,7 +24,7 @@ export const songReq = async (songmids) => {
     if (songmids instanceof Array) {
         songmids = songmids.join(',')
     }
-    const res = await get('/song/urls', {
+    const res = await post('/song/urls', {
         id: songmids
     });
     if (res) {
@@ -56,3 +56,15 @@ export const albumInfoReq = async (albummid) => {
         return;
     }
 };
+
+export const getCookieReq = async (id) => {
+    const res = await get('/user/getCookie', {
+        id: id
+    });
+    console.log(res);
+};
+
+export const getRecommondPlaylistReq = async () => {
+    const res = await get('/recommend/playlist/u');
+    console.log(res);
+}
