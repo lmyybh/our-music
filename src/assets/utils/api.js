@@ -64,7 +64,23 @@ export const getCookieReq = async (id) => {
     console.log(res);
 };
 
-export const getRecommondPlaylistReq = async () => {
-    const res = await get('/recommend/playlist/u');
+export const getDailyRecommondPlayListReq = async () => {
+    const res = await get('/recommend/daily');
     console.log(res);
-}
+    if (res) {
+        return res.data;
+    } else {
+        return;
+    }
+};
+
+export const getSonglistReq = async (pageSize = 20, pageNo = 1, sort = 5, category = 10000000) => {
+    const res = await get('/songlist/list', {
+        pageSize, pageNo, sort, category
+    });
+    if (res) {
+        return res.data;
+    } else {
+        return;
+    }
+};
