@@ -5,8 +5,12 @@
   import FooterView from './views/FooterView.vue'
   import MainView from './views/MainView.vue'
   import PlayingListView from './views/PlayingListView.vue'
+  import {getCookieReq} from './assets/utils/api.js'
+  import {qqid} from '../config'
 
   const store = useStore()
+
+  getCookieReq(qqid)
 </script>
 
 <template>

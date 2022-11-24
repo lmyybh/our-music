@@ -64,6 +64,11 @@ export const getCookieReq = async (id) => {
     console.log(res);
 };
 
+export const viewCookieReq = async () => {
+    const res = await get('/user/cookie');
+    console.log(res);
+};
+
 export const getDailyRecommondPlayListReq = async () => {
     const res = await get('/recommend/daily');
     console.log(res);
@@ -82,5 +87,14 @@ export const getSonglistReq = async (pageSize = 20, pageNo = 1, sort = 5, catego
         return res.data;
     } else {
         return;
+    }
+};
+
+export const getSonglistInfoReq = async (id) => {
+    const res = await get('/songlist', { id });
+    if (res) {
+        return res.data;
+    } else {
+        return {};
     }
 };

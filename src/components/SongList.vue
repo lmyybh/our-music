@@ -1,24 +1,26 @@
 <script setup>
+  import { useRouter } from 'vue-router'
+  import {getListenNumString} from '../assets/utils/utils.js'
   const props = defineProps({
     data: {
       type: Object,
       default: {},
     },
   })
-  function getListenNumString(listenNum) {
-    if (listenNum < 1e5) {
-      return listenNum
-    } else if (listenNum < 1e8) {
-      return Math.ceil(listenNum / 1e4) + '万'
-    } else {
-      return Math.ceil(listenNum / 1e8) + '亿'
-    }
+
+  const router = useRouter()
+
+  function clickSongList() {
+    router.push({ 
+      name: 'songlist', 
+      params: { id: props.data.dissid } 
+    })
   }
 </script>
 
 <template>
   <div class="song-list">
-    <div class="song-list-div">
+    <div class="song-list-div" @click="clickSongList">
       <div class="song-list-cover" :style="`background-image: url(${data.imgurl});`">
         <div style="display: flex; align-items: center; color: white;">
           <el-icon :size="14" style="font-weight: bold;">
