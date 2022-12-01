@@ -3,8 +3,8 @@
   import {useStore} from 'vuex'
   import {ElMessage} from 'element-plus'
   
-  import {formatInterval} from '../assets/utils/utils.js'
-  import {songReq} from '../assets/utils/api.js'
+  import {formatInterval} from '../assets/utils/utils'
+  
   
   const props = defineProps({
     data: {

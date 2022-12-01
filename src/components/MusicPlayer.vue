@@ -3,7 +3,7 @@
     import {useStore} from 'vuex'
     import {ElMessage} from 'element-plus'
     import ProgressBar from "./ProgressBar.vue"
-    import {formatInterval} from '../assets/utils/utils.js'
+    import {formatInterval} from '../assets/utils/utils'
 
     const props = defineProps({
         audioSrc: {

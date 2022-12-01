@@ -1,7 +1,7 @@
 <script setup>
   import {ref, watch, computed, onMounted} from 'vue'
   import SongList from './SongList.vue'
-  import {getSonglistReq} from '../assets/utils/api.js'
+  import {getSonglistsReq} from '../assets/utils/api'
 
   const props = defineProps({
     col: {
@@ -46,8 +46,7 @@
 
   async function getSongLists(){
     loading.value = true
-    const data = await getSonglistReq(props.pageSize, props.pageNo, props.sort, props.category)
-    listData.value = data.list
+    listData.value = await getSonglistsReq(props.pageSize, props.pageNo, props.sort, props.category)
     loading.value = false
   }
 

@@ -1,6 +1,6 @@
 import MusicList from '../utils/music'
 import { ElMessage } from 'element-plus'
-import { songReq } from '../../assets/utils/api.js'
+import { songsUrlsReq } from '../../assets/utils/api.js'
 
 export default {
     namespaced: true,
@@ -91,6 +91,10 @@ export default {
         }
     },
     actions: {
+        // async requestSongs({ commit, state }: any, songmids: Array<string>) {
+        //     const toReqSongmids = state.musics.findNotInMapSongmids(allSongmids)
+        // }
+
         async requestSongs({ commit, state }: any, songsList: Array<any>) {
             const allSongmids = songsList.map((song) => {
                 return song.songmid
@@ -99,7 +103,7 @@ export default {
             let reqSongs = new Map();
             // 存在需要新获取的歌曲时，获取信息
             if (toReqSongmids.length > 0) {
-                const songurls = await songReq(toReqSongmids)
+                const songurls = await songsUrlsReq(toReqSongmids)
                 if (!songurls || Object.keys(songurls).length <= 0) {
                     ElMessage.error('获取歌曲链接失败')
                     return

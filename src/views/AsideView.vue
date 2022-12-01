@@ -2,7 +2,7 @@
   import {ref, computed, watch} from 'vue'
   import {useStore} from 'vuex'
   
-  import {songInfoReq} from '../assets/utils/api.js'
+  import {songInfoReq} from '../assets/utils/api'
 
   const musicInfo = ref(null)
   const store = useStore()
@@ -24,14 +24,11 @@
     if (!data) {
         musicInfo.value = null
     } else {
-        const trackInfo = data.track_info
-        musicInfo.value = {}
-        musicInfo.value.songname = trackInfo.title
-        musicInfo.value.singer = trackInfo.singer[0].name
-        if (trackInfo.album.mid != '') {
-            musicInfo.value.coverSrc = `https://y.gtimg.cn/music/photo_new/T002R300x300M000${trackInfo.album.mid}.jpg`
+        musicInfo.value = data
+        if (data.albummid != '') {
+            musicInfo.value.coverSrc = `https://y.gtimg.cn/music/photo_new/T002R300x300M000${data.albummid}.jpg`
         } else {
-            musicInfo.value.coverSrc = `https://y.qq.com/music/photo_new/T001R300x300M000${trackInfo.singer[0].mid}.jpg`
+            musicInfo.value.coverSrc = `https://y.qq.com/music/photo_new/T001R300x300M000${data.singermid}.jpg`
         }
     }
   }

@@ -1,6 +1,6 @@
 <script setup>
   import { useRouter } from 'vue-router'
-  import {getListenNumString} from '../assets/utils/utils.js'
+  import {getListenNumString} from '../assets/utils/utils'
   const props = defineProps({
     data: {
       type: Object,

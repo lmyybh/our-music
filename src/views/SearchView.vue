@@ -18,23 +18,14 @@
 
   async function search(key, pageNo = 1, pageSize = 100){
     loading.value = true
-    const res = await searchReq(key, pageNo, pageSize)
-    convertToTabelData(res)
+    const searchData = await searchReq(key, pageNo, pageSize)
+    convertToTabelData(searchData)
     loading.value = false
   }
 
-  function convertToTabelData(searchData) {
-    let data = []
-    for (let i=0; i < searchData.length; i++) {
-        data[i] = {
-            id: i+1, // 由于默认0位置是空链接，所以后移一位
-            songmid: searchData[i].songmid,
-            songname: searchData[i].songname,
-            singer: searchData[i].singer[0].name,
-            albumname: searchData[i].albumname,
-            interval: searchData[i].interval,
-            pay_play: searchData[i].pay.pay_play == 1
-        }
+  function convertToTabelData(data) {
+    for (let i=0; i < data.length; i++) {
+        data[i].id = i + 1
     }
     tabelData.value = data
   }

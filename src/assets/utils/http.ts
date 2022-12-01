@@ -9,7 +9,7 @@ axios.defaults.timeout = 3000;
 //axios.defaults.withCredentials = true;
 
 // http response 拦截器
-axios.interceptors.response.use(response => {
+axios.interceptors.response.use((response: any) => {
     //==============  所有请求完成后都要执行的操作  ==================
     if (response.status && response.status == 200 && response.data && response.data.result == 200) {
         ElMessage.error(response.data.errMsg);
@@ -20,7 +20,7 @@ axios.interceptors.response.use(response => {
     return Promise.reject(err.response ? err.response.data : err);
 });
 
-export function get(url, params) {
+export function get(url: string, params: any) {
     return new Promise((resolve, reject) => {
         axios.get(url, {
             params: params
@@ -32,7 +32,7 @@ export function get(url, params) {
     });
 }
 
-export function post(url, params) {
+export function post(url: string, params: any) {
     return new Promise((resolve, reject) => {
         axios.post(url, params)
             .then(res => {

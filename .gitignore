@@ -20,6 +20,6 @@ coverage
 
 config.ts
 
-api.http
+*.http
 R-C.png
 歌单.png
