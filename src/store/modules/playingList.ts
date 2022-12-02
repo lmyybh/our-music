@@ -1,6 +1,6 @@
 import MusicList from '../utils/music'
 import { ElMessage } from 'element-plus'
-import { songsUrlsReq } from '../../assets/utils/api.js'
+import { songsUrlsReq } from '../../assets/utils/api'
 
 export default {
     namespaced: true,
@@ -91,10 +91,6 @@ export default {
         }
     },
     actions: {
-        // async requestSongs({ commit, state }: any, songmids: Array<string>) {
-        //     const toReqSongmids = state.musics.findNotInMapSongmids(allSongmids)
-        // }
-
         async requestSongs({ commit, state }: any, songsList: Array<any>) {
             const allSongmids = songsList.map((song) => {
                 return song.songmid

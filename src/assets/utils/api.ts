@@ -57,26 +57,7 @@ export const songInfoReq = async (songmid: string) => {
         data.interval = resData.interval;
         data.pay_play = resData.pay.pay_play == 1;
     }
-
-    return data;
-};
-
-export const getSongsInfoReq = async (songmids: Array<string>) => {
-    let data = [];
-    for (let i = 0; i < songmids.length; i++) {
-        data[i] = await songInfoReq(songmids[i]);
-    }
-    return data;
-};
-
-export const getSongsInfoAndUrlReq = async (songmids: Array<string>) => {
-    const urls = await songsUrlsReq(songmids);
-    const infos = await getSongsInfoReq(songmids);
-    let data = [];
-    for (let i = 0; i < songmids.length; i++) {
-        data[i] = infos[i];
-        data[i].songurl = urls[i];
-    }
+    console.log(data);
     return data;
 };
 
@@ -121,4 +102,9 @@ export const getSonglistInfoReq = async (id: string) => {
     }
 
     return data;
+};
+
+export const getUserSongLists = async () => {
+    const res: any = await get('/songlist/user', {});
+    console.log(res);
 };
