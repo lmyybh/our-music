@@ -91,8 +91,8 @@ export default {
         }
     },
     actions: {
-        async requestSongs({ commit, state }: any, songsList: Array<any>) {
-            const allSongmids = songsList.map((song) => {
+        async requestSongs({ commit, state }: any, songlists: Array<any>) {
+            const allSongmids = songlists.map((song) => {
                 return song.songmid
             })
             const toReqSongmids = state.musics.findNotInMapSongmids(allSongmids)
@@ -105,8 +105,8 @@ export default {
                     return
                 } else {
                     let reqSongs = new Map();
-                    for (let i = 0; i < songsList.length; i++) {
-                        let data = songsList[i]
+                    for (let i = 0; i < songlists.length; i++) {
+                        let data = songlists[i]
                         data.songurl = songurls[allSongmids[i]]
                         reqSongs.set(allSongmids[i], data)
                     }
@@ -116,6 +116,21 @@ export default {
                 // 不存在需要新获取的歌曲时，直接按照顺序改变
                 commit('replaceSongs', { allSongmids, reqSongs })
             }
+        },
+        async insertSongs({ dispatch, state }: any, data: any) {
+            const { songlists, index } = data;
+            let currentSongs = state.musics.getAllSongs()
+
+            let toInsertSongs = songlists.filter((info: any) => {
+                return !state.musics.has(info.songmid)
+            })
+
+            let songs = []
+            songs.push(...currentSongs.slice(0, index + 1))
+            songs.push(...toInsertSongs)
+            songs.push(...currentSongs.slice(index + 1, currentSongs.length))
+
+            await dispatch("requestSongs", songs)
         }
     }
 }

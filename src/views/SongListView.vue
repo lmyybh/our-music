@@ -1,6 +1,7 @@
 <script setup>
   import {ref, watch} from 'vue'
   import { useRoute } from 'vue-router'
+  import {useStore} from 'vuex'
   import { ElMessage } from 'element-plus'
   import {getSonglistInfoReq} from '../assets/utils/api'
   import {getListenNumString} from '../assets/utils/utils'
@@ -10,6 +11,7 @@
   const infoData = ref(null)
   const tabelData = ref(null)
   const route = useRoute()
+  const store = useStore()
 
   getSonglistInfo(route.params.id)
   
@@ -56,6 +58,27 @@
     }
     return str
   }
+
+  function playAll() {
+    store.dispatch('playingList/requestSongs', tabelData.value)
+    .then(()=>{
+      store.commit('playingList/selectSong', 1)
+      store.commit('playingList/needReload')
+      store.commit('playingList/toPlay')
+    })
+  }
+
+  function addToPlayingList() {
+    store.dispatch(
+      'playingList/insertSongs', 
+      {
+        songlists: tabelData.value, 
+        index: store.state.playingList.currentIdx - 1
+      }
+    ).then(()=>{
+      console.log(store.state.playingList.currentIdx)
+    })
+  }
 </script>
 
 <template>
@@ -79,13 +102,13 @@
           </div>
           <div>
             <el-button-group>
-              <el-button type="primary" round color="#e83c3c" style="padding-left: 10px;">
+              <el-button type="primary" round color="#e83c3c" style="padding-left: 10px;" @click="playAll">
                 <el-icon :size="18" style="margin-right: 2px;">
                   <svg t="1667808064489" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4958" width="200" height="200"><path d="M755.2 544L390.4 874.666667c-17.066667 14.933333-44.8 14.933333-59.733333-2.133334-6.4-8.533333-10.666667-19.2-10.666667-29.866666v-661.333334c0-23.466667 19.2-42.666667 42.666667-42.666666 10.666667 0 21.333333 4.266667 27.733333 10.666666l362.666667 330.666667c17.066667 14.933333 19.2 42.666667 2.133333 59.733333 2.133333 2.133333 0 2.133333 0 4.266667z" p-id="4959"></path></svg>
                 </el-icon>
                 播放全部
               </el-button>
-              <el-button type="primary" round color="#e83c3c" style="padding: 8px;">
+              <el-button type="primary" round color="#e83c3c" style="padding: 8px;" @click="addToPlayingList">
                 <el-icon :size="17"><i-ep-plus /></el-icon>
               </el-button>
             </el-button-group>

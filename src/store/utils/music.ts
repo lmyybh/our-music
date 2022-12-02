@@ -40,6 +40,9 @@ class MusicList {
         this.map.set('empty', emptyValue);
         this.list = ['empty'];
     }
+    has(songmid: string) {
+        return this.map.has(songmid);
+    }
     insert(index: number, data: any) {
         const songmid = data.songmid;
         // 如果存在，返回之前的位置

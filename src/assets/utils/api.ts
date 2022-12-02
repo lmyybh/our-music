@@ -57,7 +57,6 @@ export const songInfoReq = async (songmid: string) => {
         data.interval = resData.interval;
         data.pay_play = resData.pay.pay_play == 1;
     }
-    console.log(data);
     return data;
 };
 
