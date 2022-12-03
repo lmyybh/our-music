@@ -1,4 +1,7 @@
+import cookies from 'vue-cookies'
 import { get, post } from './http'
+
+const MAX_NUM = 50;
 
 export const searchReq = async (key: string, pageNo = 1, pageSize = 20, t = 0) => {
     const res: any = await post('search', {
@@ -27,17 +30,24 @@ export const searchReq = async (key: string, pageNo = 1, pageSize = 20, t = 0) =
 };
 
 export const songsUrlsReq = async (songmids: string | Array<string>) => {
-    if (songmids instanceof Array) {
-        songmids = songmids.join(',')
+    if (songmids instanceof String) {
+        songmids = [songmids];
     }
-    const res: any = await post('/song/urls', {
-        id: songmids
-    });
-    if (res) {
-        return res.data;
-    } else {
-        return [];
+    console.log(songmids)
+    let promise = [];
+    for (let i = 0; i < Math.ceil(songmids.length / MAX_NUM); i++) {
+        let params = songmids.slice(i * MAX_NUM, (i + 1) * MAX_NUM).join(',');
+        console.log(params);
+        promise.push(post('/song/urls', { id: params }));
     }
+    const promiseRes: Array<any> = await Promise.all(promise);
+    console.log(promiseRes)
+    let data = {};
+    for (let r of promiseRes) {
+        data = Object.assign(data, r.data);
+    }
+
+    return data;
 };
 
 export const songInfoReq = async (songmid: string) => {
@@ -60,6 +70,34 @@ export const songInfoReq = async (songmid: string) => {
     return data;
 };
 
+
+export const songsInfoReq = async (songmids: Array<string>) => {
+    const res: any = await get('/song/songs', {
+        songmids: songmids
+    });
+
+    let data: any = {};
+    if (res) {
+        const resData = res.data;
+        for (let mid of songmids) {
+            let info = resData[mid].track_info;
+            data[mid] = {
+                songmid: mid,
+                songname: info.name,
+                singer: info.singer[0].name,
+                singermid: info.singer[0].mid,
+                albumname: info.album.name,
+                albummid: info.album.mid,
+                interval: info.interval,
+                pay_play: info.pay.pay_play == 1
+            }
+        }
+    }
+
+    return data;
+};
+
+
 export const getCookieReq = async (id: string) => {
     const res = await get('/user/getCookie', {
         id: id
@@ -67,6 +105,16 @@ export const getCookieReq = async (id: string) => {
     console.log(res);
 };
 
+export const getUserDetail = async () => {
+    const res: any = await get('/user/detail', {
+        id: cookies.get("uin")
+    });
+    if (res) {
+        return res.data;
+    } else {
+        return {};
+    }
+}
 
 export const getSonglistsReq = async (pageSize = 20, pageNo = 1, sort = 5, category = 10000000) => {
     const res: any = await get('/songlist/list', {
@@ -103,7 +151,71 @@ export const getSonglistInfoReq = async (id: string) => {
     return data;
 };
 
-export const getUserSongLists = async () => {
-    const res: any = await get('/songlist/user', {});
-    console.log(res);
+export const getUserSonglists = async () => {
+    const res: any = await get('/songlist/user', { id: cookies.get("uin") });
+
+    if (res) {
+        return res.data;
+    } else {
+        return [];
+    }
 };
+
+export const getUserSonglistInfoReq = async (id: string) => {
+    const res: any = await get('/songlist/map', { dirid: id });
+    let data: any = {};
+
+    if (!res) {
+        return data;
+    }
+
+    // 获取歌曲信息
+    data.songlist = [];
+    let songmids = Object.keys(res.data.mid);
+    songmids.sort();
+
+    let songsData: any = {};
+    let promise = [];
+    for (let i = 0; i < Math.ceil(songmids.length / MAX_NUM); i++) {
+        promise.push(songsInfoReq(songmids.slice(i * MAX_NUM, (i + 1) * MAX_NUM)))
+    }
+    const promiseData = await Promise.all(promise)
+
+    for (let d of promiseData) {
+        songsData = Object.assign(songsData, d)
+    }
+
+    if (songsData) {
+        for (let i = 0; i < songmids.length; i++) {
+            data.songlist[i] = songsData[songmids[i]];
+        }
+    }
+
+    const detail = await getUserDetail();
+    let nickname = 'unknown'
+    if (detail) {
+        nickname = detail.creator.nick;
+    }
+
+    // 获取歌单信息
+    data.info = {};
+    const songlists = await getUserSonglists();
+    if (songlists) {
+        for (let info of songlists) {
+            if (info.dirid == Number(id)) {
+                data.info = {
+                    logo: info.dirid != 201 ? info.diss_cover : 'http://y.qq.com/mediastyle/global/img/cover_like.png?max_age=2592000',
+                    dissname: info.diss_name,
+                    nickname: nickname,
+                    ctime: undefined,
+                    tags: [],
+                    songnum: info.song_cnt,
+                    visitnum: info.listen_num,
+                    desc: '暂无',
+                };
+                break;
+            }
+        }
+    }
+    return data;
+}

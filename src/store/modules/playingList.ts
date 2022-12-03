@@ -101,7 +101,7 @@ export default {
             if (toReqSongmids.length > 0) {
                 const songurls = await songsUrlsReq(toReqSongmids)
                 if (!songurls || Object.keys(songurls).length <= 0) {
-                    ElMessage.error('获取歌曲链接失败')
+                    ElMessage.error('获取未添加歌曲链接失败')
                     return
                 } else {
                     let reqSongs = new Map();

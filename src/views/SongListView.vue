@@ -3,7 +3,7 @@
   import { useRoute } from 'vue-router'
   import {useStore} from 'vuex'
   import { ElMessage } from 'element-plus'
-  import {getSonglistInfoReq} from '../assets/utils/api'
+  import {getSonglistInfoReq, getUserSonglistInfoReq} from '../assets/utils/api'
   import {getListenNumString} from '../assets/utils/utils'
   import MusicList from '../components/MusicList.vue'
 
@@ -24,9 +24,15 @@
 
   async function getSonglistInfo(id){
     loading.value = true
-    const data = await getSonglistInfoReq(id)
 
-    if (Object.keys(data).length>0) {
+    let data
+    if (route.name == "songlist") {
+      data = await getSonglistInfoReq(id)
+    } else {
+      data = await getUserSonglistInfoReq(id)
+    }
+
+    if (data) {
       infoData.value = data.info
       convertToTabelData(data.songlist)
     } else {
@@ -43,6 +49,9 @@
   }
 
   function getTimeString(stamp) {
+    if (!stamp) {
+      return 'unknown'
+    }
     const date = new Date(stamp * 1000)
     const Y = date.getFullYear() + '-'
     const M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
@@ -76,7 +85,7 @@
         index: store.state.playingList.currentIdx - 1
       }
     ).then(()=>{
-      console.log(store.state.playingList.currentIdx)
+      ElMessage.info("歌曲已添加到播放列表")
     })
   }
 </script>

@@ -20,6 +20,11 @@ const router = createRouter({
       path: '/songlist/:id',
       name: 'songlist',
       component: SongListView
+    },
+    {
+      path: '/usonglist/:id',
+      name: 'usonglist',
+      component: SongListView
     }
   ]
 })
