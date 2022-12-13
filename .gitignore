@@ -19,6 +19,7 @@ coverage
 .vscode/*
 
 config.ts
+.env*
 
 *.http
 R-C.png
