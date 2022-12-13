@@ -31,8 +31,8 @@
     } else {
       data = await getUserSonglistInfoReq(id)
     }
-
-    if (data) {
+    
+    if (Object.keys(data).length > 0) {
       infoData.value = data.info
       convertToTabelData(data.songlist)
     } else {
@@ -142,7 +142,7 @@
       <MusicList :data="tabelData" />
     </div>
     <div v-else v-loading="loading" element-loading-text="载入中" style="display: flex; justify-content: center; margin-top: 200px;">
-      <el-alert v-show="!loading" center title="歌单信息加载失败" type="error" style="width: 300px;" />
+      <el-alert v-show="!loading" :closable="false" center title="歌单信息加载失败" type="error" style="width: 300px;" />
     </div>
   </div>
 </template>

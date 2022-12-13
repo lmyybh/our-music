@@ -1,10 +1,12 @@
 import cookies from 'vue-cookies'
 import { get, post } from './http'
+import { ElMessage } from 'element-plus'
 
+const BASE_URL = "/api/";
 const MAX_NUM = 50;
 
 export const searchReq = async (key: string, pageNo = 1, pageSize = 20, t = 0) => {
-    const res: any = await post('search', {
+    const res: any = await post(BASE_URL + 'search', {
         key: key,
         pageNo: pageNo,
         pageSize: pageSize,
@@ -33,15 +35,14 @@ export const songsUrlsReq = async (songmids: string | Array<string>) => {
     if (songmids instanceof String) {
         songmids = [songmids];
     }
-    console.log(songmids)
+
     let promise = [];
     for (let i = 0; i < Math.ceil(songmids.length / MAX_NUM); i++) {
         let params = songmids.slice(i * MAX_NUM, (i + 1) * MAX_NUM).join(',');
-        console.log(params);
-        promise.push(post('/song/urls', { id: params }));
+        promise.push(post(BASE_URL + '/song/urls', { id: params }));
     }
     const promiseRes: Array<any> = await Promise.all(promise);
-    console.log(promiseRes)
+
     let data = {};
     for (let r of promiseRes) {
         data = Object.assign(data, r.data);
@@ -51,7 +52,7 @@ export const songsUrlsReq = async (songmids: string | Array<string>) => {
 };
 
 export const songInfoReq = async (songmid: string) => {
-    const res: any = await get('/song', {
+    const res: any = await get(BASE_URL + '/song', {
         songmid: songmid
     });
 
@@ -72,7 +73,7 @@ export const songInfoReq = async (songmid: string) => {
 
 
 export const songsInfoReq = async (songmids: Array<string>) => {
-    const res: any = await get('/song/songs', {
+    const res: any = await get(BASE_URL + '/song/songs', {
         songmids: songmids
     });
 
@@ -97,16 +98,8 @@ export const songsInfoReq = async (songmids: Array<string>) => {
     return data;
 };
 
-
-export const getCookieReq = async (id: string) => {
-    const res = await get('/user/getCookie', {
-        id: id
-    });
-    console.log(res);
-};
-
 export const getUserDetail = async () => {
-    const res: any = await get('/user/detail', {
+    const res: any = await get(BASE_URL + '/user/detail', {
         id: cookies.get("uin")
     });
     if (res) {
@@ -117,7 +110,7 @@ export const getUserDetail = async () => {
 }
 
 export const getSonglistsReq = async (pageSize = 20, pageNo = 1, sort = 5, category = 10000000) => {
-    const res: any = await get('/songlist/list', {
+    const res: any = await get(BASE_URL + '/songlist/list', {
         pageSize, pageNo, sort, category
     });
     if (res) {
@@ -128,7 +121,7 @@ export const getSonglistsReq = async (pageSize = 20, pageNo = 1, sort = 5, categ
 };
 
 export const getSonglistInfoReq = async (id: string) => {
-    const res: any = await get('/songlist', { id });
+    const res: any = await get(BASE_URL + '/songlist', { id });
     let data: any = {};
     if (res) {
         let resData = res.data;
@@ -152,7 +145,7 @@ export const getSonglistInfoReq = async (id: string) => {
 };
 
 export const getUserSonglists = async () => {
-    const res: any = await get('/songlist/user', { id: cookies.get("uin") });
+    const res: any = await get(BASE_URL + '/songlist/user', { id: cookies.get("uin") });
 
     if (res) {
         return res.data;
@@ -162,10 +155,10 @@ export const getUserSonglists = async () => {
 };
 
 export const getUserSonglistInfoReq = async (id: string) => {
-    const res: any = await get('/songlist/map', { dirid: id });
+    const res: any = await get(BASE_URL + '/songlist/map', { dirid: id });
     let data: any = {};
-
-    if (!res) {
+    if (!res || !res.data) {
+        ElMessage.error("api:" + res.errMsg);
         return data;
     }
 
@@ -218,4 +211,11 @@ export const getUserSonglistInfoReq = async (id: string) => {
         }
     }
     return data;
-}
+};
+
+export const getCookieReq = async (id: string) => {
+    const res = await get(BASE_URL + '/user/getCookie', {
+        id: id
+    });
+    console.log(res);
+};

@@ -42,9 +42,14 @@ export default defineConfig({
     port: 8888,
     proxy: {
       '/api': {
-        target: getEnv('dev').target,	//实际请求地址
+        target: getEnv('dev').api_url,	//实际请求地址
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
+      },
+      '/server': {
+        target: getEnv('dev').server_url,	//实际请求地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/server/, '')
       },
     }
   },

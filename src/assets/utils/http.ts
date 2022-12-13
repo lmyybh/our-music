@@ -3,9 +3,8 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
 //axios定义
-axios.defaults.baseURL = '/api/';
 axios.defaults.headers['Content-Type'] = 'application/json';
-axios.defaults.timeout = 3000;
+axios.defaults.timeout = 5000;
 //axios.defaults.withCredentials = true;
 
 // http response 拦截器
@@ -17,6 +16,7 @@ axios.interceptors.response.use((response: any) => {
     }
     return response;
 }, err => {
+    ElMessage.error(err.response.data ? err.response.data : "未知错误");
     return Promise.reject(err.response ? err.response.data : err);
 });
 

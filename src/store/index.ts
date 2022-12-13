@@ -1,9 +1,11 @@
 import { createStore } from 'vuex'
 import playingList from './modules/playingList'
+import user from './modules/user'
 
 const store = createStore({
     modules: {
-        playingList: playingList
+        playingList: playingList,
+        user: user
     }
 })
 
