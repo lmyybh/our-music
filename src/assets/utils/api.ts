@@ -219,3 +219,14 @@ export const getCookieReq = async (id: string) => {
     });
     console.log(res);
 };
+
+export const setCookiesReq = async (cookiesStr: string) => {
+    const res: any = await post(BASE_URL + '/user/setCookie', {
+        data: cookiesStr
+    });
+    if (res && res.result == 100) {
+        return true;
+    } else {
+        return false;
+    }
+};

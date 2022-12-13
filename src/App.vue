@@ -7,7 +7,6 @@
   import MainView from './views/MainView.vue'
   import PlayingListView from './views/PlayingListView.vue'
   import {getCookieReq} from './assets/utils/api'
-  import {qqid} from '../config'
   
   const store = useStore()
 
@@ -31,7 +30,7 @@
   init()
 
   async function init() {
-    await getCookieReq(qqid)
+    await getCookieReq()
     //connect()
   }
   

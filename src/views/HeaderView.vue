@@ -1,29 +1,54 @@
 <script setup lang="ts">
-    import {ref, computed} from 'vue'
-    import { useRouter } from 'vue-router'
-    import { useStore } from 'vuex'
-    
-    const searchKey = ref('')
-    const router = useRouter()
-    const store = useStore()
+  import {ref, computed} from 'vue'
+  import { useRouter } from 'vue-router'
+  import { useStore } from 'vuex'
+  import { ElMessage } from 'element-plus'
+  import {parseCookiesStr} from '@/assets/utils/utils'
+  import {setCookiesReq} from '@/assets/utils/api'
+  
+  const searchKey = ref('')
+  const cookiesDialogVisible = ref(false)
+  const cookies = ref('')
+  const router = useRouter()
+  const store = useStore()
 
-    const username = computed(()=>{
-        const name = store.state.user.username
-        return name == "" ? "未登录" : name
+  const username = computed(()=>{
+      const name = store.state.user.username
+      return name == "" ? "未登录" : name
+  })
+
+  function search() {
+    router.push({ 
+      name: 'search', 
+      params: { key: searchKey.value, pageNo: 1 } 
     })
+  }
 
-    function search() {
-      router.push({ 
-        name: 'search', 
-        params: { key: searchKey.value, pageNo: 1 } 
-      })
-    }
+  function clickAppIcon() {
+    router.push({
+      name: 'home'
+    })
+  }
 
-    function clickAppIcon() {
-      router.push({
-        name: 'home'
-      })
+  async function setCookies() {
+    if (cookies.value == "") {
+      ElMessage.warning("cookies值不能为空")
+      return
     }
+    let cookiesStr = parseCookiesStr(cookies.value)
+    if (cookiesStr == "") {
+      ElMessage.warning("未获取到cookies值")
+      return
+    }
+    const state = await setCookiesReq(cookiesStr);
+    if (state) {
+      cookies.value = ""
+      cookiesDialogVisible.value = false
+      ElMessage.success("cookies设置成功")
+    } else {
+      ElMessage.error("cookies设置失败")
+    }
+  }
 </script>
 
 
@@ -61,6 +86,7 @@
                 </div>
                 <template #dropdown>
                   <el-dropdown-menu>
+                    <el-dropdown-item @click="()=>{cookiesDialogVisible=true}">Cookies</el-dropdown-item>
                     <el-dropdown-item @click="store.dispatch('user/logout')">注销</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
@@ -69,6 +95,18 @@
           </el-col>
         </el-row>
   </div>
+
+  <el-dialog
+    class="cookies-dialog"
+    v-model="cookiesDialogVisible"
+    title="设置 QQApi Cookies"
+    align-center
+  >
+    <div class="cookies-form">
+      <textarea class="info-input" placeholder="cookies" v-model="cookies" ></textarea>
+      <button @click="setCookies">提交</button>
+    </div>
+  </el-dialog>
 </template>
 
 <style lang="scss">
@@ -116,6 +154,66 @@
     margin-left: 8px;
     color: white;
     font-size: small;
+  }
+}
+.cookies-dialog {
+  width: 350px;
+  border-radius: 5px;
+
+  .el-dialog__header {
+    text-align: center;
+    margin: 0;
+    
+    .el-dialog__title {
+      font-weight: 550;
+    }
+  }
+
+  .el-dialog__body {
+    padding: 20px;
+  }
+}
+
+.cookies-form {
+  textarea,
+  button {
+    width: 80%;
+    margin-left: 10%;
+    margin-bottom: 25px;
+    height: 40px;
+    border-radius: 5px;
+    outline: 0;
+    -moz-outline-style: none;
+  }
+
+  textarea {
+    overflow: hidden;
+    height: 150px;
+    border: 1px solid #bbb;
+    padding: 10px;
+    font-size: 16px;
+    &:focus {
+      border: 1px solid #3498db;
+    }
+  }
+
+  button {
+    background: #e74c3c;
+    border:none;
+    color: white;
+    font-size: 18px;
+    font-weight: 200;
+    cursor: pointer;
+    transition: box-shadow .4s ease;
+    
+    &:hover {
+      box-shadow: 1px 1px 5px #555;  
+    }
+      
+    &:active {
+        box-shadow: 1px 1px 7px #222;  
+    }
+    
   }
 }
 </style>

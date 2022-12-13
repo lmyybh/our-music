@@ -14,3 +14,15 @@ export const getListenNumString = (listenNum: number) => {
         return Math.ceil(listenNum / 1e8) + '亿'
     }
 };
+
+export const parseCookiesStr = (info: string) => {
+    const re = /"cookie": ".*",/
+    const res = re.exec(info)
+    if (!res) {
+        return ''
+    } else {
+        let cookies = res[0]
+        cookies = cookies.slice(11, cookies.length - 2)
+        return cookies
+    }
+};
