@@ -6,16 +6,29 @@
   import FooterView from './views/FooterView.vue'
   import MainView from './views/MainView.vue'
   import PlayingListView from './views/PlayingListView.vue'
-  import {getCookieReq} from './assets/utils/api'
+  import {getCookiesReq} from './assets/utils/api'
   
   const store = useStore()
 
+  const loginDialogVisible = ref(true)
   const username = ref('')
   const password = ref('')
+
+  let socket
   
-  const loginDialogVisible = computed(()=>{
+  const showLoginDialog = computed(() => {
     return !store.state.user.isLogined;
   })
+
+  init()
+
+  async function init() {
+    const res = await getCookiesReq()
+    if (res) {
+      store.dispatch("user/getUserSonglists")
+    }
+    //connect()
+  }
 
   async function login() {
     await store.dispatch("user/login", {username: username.value, password: password.value})
@@ -24,18 +37,9 @@
       password.value = ''
     }
   }
-
-  let socket
-
-  init()
-
-  async function init() {
-    await getCookieReq()
-    //connect()
-  }
   
   // function connect() {
-  //   socket = new WebSocket("ws://localhost:52121/playlist/socket")
+  //   socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_URL)
   //   socket.onopen = socketOpen
   //   socket.onerror = socketError
   //   socket.onmessage = socketMessage
@@ -44,7 +48,7 @@
 
   // function socketOpen() {
   //   console.log('open')
-  //   socket.send("123")
+  //   socket.send(store.state.user.username)
   // }
 
   // function socketError() {
@@ -86,8 +90,9 @@
   </div>
 
   <el-dialog
-    class="login-dialog"
+    v-if="showLoginDialog"
     v-model="loginDialogVisible"
+    class="login-dialog"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :show-close="false"

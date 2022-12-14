@@ -1,6 +1,7 @@
 import cookies from 'vue-cookies'
 import { get, post } from './http'
 import { ElMessage } from 'element-plus'
+import store from '@/store';
 
 const BASE_URL = "/api/";
 const MAX_NUM = 50;
@@ -144,7 +145,7 @@ export const getSonglistInfoReq = async (id: string) => {
     return data;
 };
 
-export const getUserSonglists = async () => {
+export const getUserSonglistsReq = async () => {
     const res: any = await get(BASE_URL + '/songlist/user', { id: cookies.get("uin") });
 
     if (res) {
@@ -192,7 +193,7 @@ export const getUserSonglistInfoReq = async (id: string) => {
 
     // 获取歌单信息
     data.info = {};
-    const songlists = await getUserSonglists();
+    const songlists = await getUserSonglistsReq();
     if (songlists) {
         for (let info of songlists) {
             if (info.dirid == Number(id)) {
@@ -213,11 +214,24 @@ export const getUserSonglistInfoReq = async (id: string) => {
     return data;
 };
 
-export const getCookieReq = async (id: string) => {
-    const res = await get(BASE_URL + '/user/getCookie', {
+export const getCookiesReq = async (id: string) => {
+    const res: any = await get(BASE_URL + '/user/getCookie', {
         id: id
     });
-    console.log(res);
+    const cookiesObj = res.data || {};
+    if (Object.keys(cookiesObj).length <= 0) {
+        ElMessage.error("QQ Api 服务器不存在 cookies，请先设置");
+        return false;
+    } else {
+        Object.keys(cookiesObj).forEach((k) => {
+            // 有些过大的cookie 对登录校验无用，但是会导致报错
+            if (cookiesObj[k].length < 255) {
+                cookies.set(k, cookiesObj[k], new Date(Date.now() + 86400000));
+            }
+        });
+        ElMessage.success("获取 Cookies 成功");
+        return true;
+    }
 };
 
 export const setCookiesReq = async (cookiesStr: string) => {

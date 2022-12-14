@@ -4,7 +4,7 @@
   import { useStore } from 'vuex'
   import { ElMessage } from 'element-plus'
   import {parseCookiesStr} from '@/assets/utils/utils'
-  import {setCookiesReq} from '@/assets/utils/api'
+  import {setCookiesReq, getCookiesReq} from '@/assets/utils/api'
   
   const searchKey = ref('')
   const cookiesDialogVisible = ref(false)
@@ -45,6 +45,10 @@
       cookies.value = ""
       cookiesDialogVisible.value = false
       ElMessage.success("cookies设置成功")
+      const res = await getCookiesReq();
+      if (res) {
+        store.dispatch("user/getUserSonglists")
+      }
     } else {
       ElMessage.error("cookies设置失败")
     }

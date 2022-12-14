@@ -2,14 +2,17 @@
   import {ref, computed, watch, onMounted} from 'vue'
   import {useStore} from 'vuex'
   import { ElMessage } from 'element-plus'
-  import {songInfoReq, getUserSonglists} from '../assets/utils/api'
+  import {songInfoReq} from '../assets/utils/api'
 
   const musicInfo = ref(null)
-  const songlists = ref(null)
   const store = useStore()
   
   const songmid = computed(() => {
     return store.getters['playingList/currentSongmid']
+  })
+
+  const songlists = computed(() => {
+    return store.state.user.userSonglists;
   })
 
   watch(songmid, (newMid) => {
@@ -18,18 +21,6 @@
     } else {
         getMusicInfo(newMid)
     }
-  })
-
-  onMounted(async ()=>{
-    const data = await getUserSonglists()
-    if (!data) {
-        ElMessage.error('获取用户歌单信息失败')
-        return
-    }
-
-    songlists.value = data.filter(info => {
-        return info.diss_name != "QZone背景音乐" && info.diss_name != "本地上传"
-    })
   })
 
   async function getMusicInfo(songmid) {
