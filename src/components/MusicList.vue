@@ -1,5 +1,5 @@
 <script setup>
-  import {ref, onMounted, watch, getCurrentInstance} from 'vue'
+  import {ref, onMounted, watch, getCurrentInstance, nextTick} from 'vue'
   import {useStore} from 'vuex'
   import {ElMessage} from 'element-plus'
   
@@ -41,6 +41,8 @@
       default: []
     }
   })
+
+  const emit = defineEmits(['rightClick'])
 
   const store = useStore()
   const { proxy } = getCurrentInstance()
@@ -89,6 +91,20 @@
       store.commit('playingList/toPlay')
     })
   }
+
+  async function rightClick(row, column, event) {
+    const space = 30 // 边距余量
+
+    store.commit("menu/showMenu")
+    await nextTick() // 等待 DOM 更新
+    const div = document.getElementById("float-menu") // 获取 menu 元素
+
+    // 对 left 和 top 做限制，防止超出屏幕，出现进度条
+    store.commit("menu/setLeft", Math.min(document.body.clientWidth - div.offsetWidth - space, event.clientX))
+    store.commit("menu/setTop", Math.min(document.body.clientHeight - div.offsetHeight - space, event.clientY))
+    
+    emit("rightClick", {row, event})
+  }
 </script>
 
 <template>
@@ -103,6 +119,7 @@
       style="width: 100%; height: 100%;"
       @row-click="rowClick"
       @row-dblclick="rowDblClick"
+      @row-contextmenu="rightClick"
     >
       <el-table-column v-if="showIndex" type="index" :width="widths.index" /> 
       <el-table-column label="音乐标题" >

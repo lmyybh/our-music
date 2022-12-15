@@ -8,10 +8,20 @@
   import FooterView from './views/FooterView.vue'
   import MainView from './views/MainView.vue'
   import PlayingListView from './views/PlayingListView.vue'
+  import Menu from './components/Menu.vue'
   import {getCookiesReq} from './assets/utils/api'
   
+  // 阻止浏览器的右击事件
+  document.oncontextmenu = function(){
+    return false;
+  }
+
   const { proxy } = getCurrentInstance()
   const store = useStore()
+
+  document.onclick = function() {
+    store.commit("menu/hideMenu")
+  }
 
   const loginDialogVisible = ref(true)
   const username = ref('')
@@ -23,6 +33,22 @@
   
   const showLoginDialog = computed(() => {
     return !store.state.user.isLogined
+  })
+
+  const showMenu = computed(() => {
+    return store.state.menu.display
+  })
+
+  const menuItems = computed(() => {
+    return store.state.menu.items
+  })
+
+  const menuTop = computed(() => {
+    return store.state.menu.top
+  })
+
+  const menuLeft = computed(() => {
+    return store.state.menu.left
   })
 
   init()
@@ -162,6 +188,13 @@
     </el-container>
   </div>
 
+  <Menu 
+    class="app-menu"
+    :style="`top: ${menuTop}px; left: ${menuLeft}px;`"
+    v-show="showMenu"
+    :items="menuItems"
+  />
+
   <el-dialog
     v-if="showLoginDialog"
     v-model="loginDialogVisible"
@@ -219,6 +252,12 @@
   border-top-left-radius: 5px;
   background-color: white;
 }
+.app-menu {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+}
+
 .login-dialog {
   width: 350px;
   border-radius: 5px;

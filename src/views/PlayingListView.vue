@@ -60,6 +60,14 @@
       publish(loginedUsername.value, JSON.stringify(data))
     }
   }
+
+  function rightClickList({row, event}) {
+    let items = [
+      {'name': '播放', 'callback': ()=>{store.dispatch("playingList/playSong", row)}},
+      {'name': '从列表中删除', 'callback': ()=>{store.commit("playingList/removeSong", row.songmid)}},
+    ]
+    store.commit("menu/changeItems", items)
+  }
 </script>
 
 <template>
@@ -80,6 +88,7 @@
       :showHeader="false" 
       :showIndex="false"
       :showAlbum="false"
+      @right-click="rightClickList"
       :widths="{index: 0, singer: 100, album: 0, interval: 80}"
      />
   </div>

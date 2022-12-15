@@ -88,6 +88,14 @@
       ElMessage.info("歌曲已添加到播放列表")
     })
   }
+
+  function rightClickList({row, event}) {
+    let items = [
+      {'name': '播放', 'callback': ()=>{store.dispatch("playingList/playSong", row)}},
+      {'name': '下一首播放', 'callback': ()=>{store.dispatch("playingList/nextToPlay", row)}}
+    ]
+    store.commit("menu/changeItems", items)
+  }
 </script>
 
 <template>
@@ -139,7 +147,7 @@
           </div>
         </div>
       </div>
-      <MusicList :data="tabelData" />
+      <MusicList :data="tabelData" @right-click="rightClickList" />
     </div>
     <div v-else v-loading="loading" element-loading-text="载入中" style="display: flex; justify-content: center; margin-top: 200px;">
       <el-alert v-show="!loading" :closable="false" center title="歌单信息加载失败" type="error" style="width: 300px;" />

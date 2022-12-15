@@ -42,6 +42,7 @@ declare module '@vue/runtime-core' {
     IEpRefresh: typeof import('~icons/ep/refresh')['default']
     IEpSearch: typeof import('~icons/ep/search')['default']
     Login: typeof import('./src/components/Login.vue')['default']
+    Menu: typeof import('./src/components/Menu.vue')['default']
     MusicList: typeof import('./src/components/MusicList.vue')['default']
     MusicPlayer: typeof import('./src/components/MusicPlayer.vue')['default']
     ProgressBar: typeof import('./src/components/ProgressBar.vue')['default']

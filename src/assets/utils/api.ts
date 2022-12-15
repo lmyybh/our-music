@@ -32,7 +32,7 @@ export const searchReq = async (key: string, pageNo = 1, pageSize = 20, t = 0) =
 };
 
 export const songsUrlsReq = async (songmids: string | Array<string>) => {
-    if (songmids instanceof String) {
+    if (typeof (songmids) == 'string') {
         songmids = [songmids];
     }
 

@@ -43,17 +43,25 @@ class MusicList {
     has(songmid: string) {
         return this.map.has(songmid);
     }
+    find(songmid: string) {
+        return this.list.indexOf(songmid)
+    }
     insert(index: number, data: any) {
         const songmid = data.songmid;
-        // 如果存在，返回之前的位置
-        if (this.map.has(songmid)) {
-            return this.list.indexOf(songmid);
-        }
+        // 查询是否存在
+        let idx = this.find(songmid);
 
-        // 不存在，插入指定位置
+        // 插入指定位置
         this.list.splice(index, 0, songmid);
-        this.map.set(songmid, formatData(data));
-        return index;
+
+        // 如果存在，删除原先的值
+        if (idx >= 0) {
+            this.list.splice(idx, 1);
+        } else {
+            this.map.set(songmid, formatData(data));
+        }
+        // 返回插入后的位置 （有可能删除了靠前的元素，所以不一定是 index）
+        return this.find(songmid);
     }
     append(data: any) {
         return this.insert(this.list.length, data);

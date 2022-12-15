@@ -49,6 +49,21 @@ export default {
         addSong(state: any, data: any) {
             state.musics.append(data)
         },
+        removeSong(state: any, songmid: string) {
+            if (state.musics.has(songmid)) {
+                let idx = state.musics.find(songmid)
+                state.musics.remove(songmid)
+                if (idx < state.currentIdx) {
+                    state.currentIdx -= 1
+                } else {
+                    this.commit("playingList/selectSong", state.currentIdx)
+                }
+            }
+        },
+        insertSong(state: any, data: any) {
+            const { index, songdata } = data
+            state.musics.insert(index, songdata)
+        },
         replaceMusics(state: any, songmids: Array<string>, data: any) {
             state.musics.replaceAll(songmids, data)
         },
@@ -195,6 +210,33 @@ export default {
                 // 不存在需要新获取的歌曲时，直接按照顺序改变
                 commit('replaceSongs', { allSongmids, reqSongs })
             }
+        },
+        async playSong({ commit, state }: any, data: any) {
+            const songmid: string = data.songmid;
+            if (!state.musics.has(songmid)) {
+                const songurls: any = await songsUrlsReq(songmid)
+                data.songurl = songurls[songmid]
+                commit('addSong', data)
+            }
+            commit('selectSong', state.musics.find(songmid))
+            commit('toPlay')
+        },
+        async nextToPlay({ commit, state }: any, data: any) {
+            const songmid: string = data.songmid;
+
+            // 如果正在播放，忽略
+            if (state.musics.getInfo(state.currentIdx).songmid == songmid) {
+                return
+            }
+
+            if (!state.musics.has(songmid)) {
+                const songurls: any = await songsUrlsReq(songmid)
+                data.songurl = songurls[songmid]
+            } else {
+                data = state.musics.getInfoBySongmid(songmid)
+            }
+            commit('insertSong', { index: state.currentIdx + 1, songdata: data })
+            commit('selectSong', Math.max(1, state.musics.find(songmid) - 1))
         }
     }
 }
