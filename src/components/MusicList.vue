@@ -35,6 +35,10 @@
     selectRowIndex: {
       type: Number,
       default: -1
+    },
+    unableRowIndexs: {
+      type: Array,
+      default: []
     }
   })
 
@@ -50,6 +54,13 @@
   watch(() => props.selectRowIndex, (newIndex) => {
       setCurrent(props.data[newIndex])
   })
+
+  const tableRowClassName = ({row, rowIndex,}) => {
+    if (props.unableRowIndexs.indexOf(rowIndex) >= 0) {
+      return 'unable-row'
+    }
+    return ''
+  }
 
   function setCurrent(row) {
     proxy.$refs.table.setCurrentRow(row)
@@ -86,6 +97,7 @@
       ref="table"
       :data="data"
       :show-header="showHeader"
+      :row-class-name="tableRowClassName"
       highlight-current-row 
       stripe 
       style="width: 100%; height: 100%;"
@@ -120,5 +132,8 @@
 }
 .music-list .el-table .cell {
   white-space: nowrap;
+}
+.el-table .unable-row {
+  color: rgb(212, 212, 212);
 }
 </style>

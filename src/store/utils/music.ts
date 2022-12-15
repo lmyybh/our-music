@@ -99,6 +99,14 @@ class MusicList {
         let data: any = this.map.get(this.list[index])
         return Object.fromEntries(data)
     }
+    getInfoBySongmid(songmid: string) {
+        if (!this.map.has(songmid)) {
+            return {}
+        } else {
+            let data: any = this.map.get(songmid)
+            return Object.fromEntries(data)
+        }
+    }
     findNextMusicIndex(index: number) {
         for (let i = index; i < this.list.length; i++) {
             let data: any = this.map.get(this.list[i])

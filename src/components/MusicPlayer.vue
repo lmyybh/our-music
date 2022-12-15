@@ -14,21 +14,19 @@
 
     let audio = new Audio()
     let isDraging = false
-    let canPlayThrough = false
     
     const store = useStore()
     
     const wantToPlay = computed(()=>{
         return store.state.playingList.wantToPlay
     })
-
+    
+    const canPlayThrough = ref(false)
     const isPlaying = ref(false)
     const progress = ref(0)
     const preText = ref('00:00')
     const postText = ref('00:00')
     const volumeProgress = ref(audio.volume*100)
-    
-    
 
     onMounted(() => {
         changeAudio(props.audioSrc)
@@ -42,7 +40,7 @@
         })
         audio.addEventListener('canplaythrough', ()=>{
             postText.value = formatInterval(audio.duration)
-            canPlayThrough = true
+            canPlayThrough.value = true
 
             if (isDraging || !wantToPlay.value) {
                 pause()
@@ -80,8 +78,37 @@
         }
     })
 
+    const progressValueToChange = computed(()=>{
+        return canPlayThrough.value ? store.state.playingList.progressValueToChange : -1
+    })
+
+    watch(progressValueToChange, (newValue) => {
+        console.log('progressValueToChange', newValue)
+        if (newValue > 0) {
+            console.log('canPlayThrough', canPlayThrough.value)
+            changeTime(newValue / 100)
+            store.commit('playingList/notNeedChangeProgress')
+        }
+    })
+
+    watch(isPlaying, (newState) => {
+        store.commit('playingList/setIsPlaying', newState)
+    })
+
+    watch(progress, (newValue) => {
+        store.commit('playingList/setProgressValue', newValue)
+    })
+
+    watch(wantToPlay, (newState) => {
+        if (newState) {
+            play()
+        } else {
+            pause()
+        }
+    })
+
     function changeAudio(src) {
-        canPlayThrough = false
+        canPlayThrough.value = false
         audio.src = src
         audio.load()
         if (src === '') {
@@ -108,7 +135,7 @@
             return
         }
 
-        if (!canPlayThrough) {
+        if (!canPlayThrough.value) {
             if (store.getters['playingList/numMusics'] == 0) {
                 ElMessage.info('播放列表没有歌曲，快去点歌吧')
             } else {

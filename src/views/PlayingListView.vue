@@ -1,9 +1,12 @@
 <script setup>
-  import {computed} from 'vue'
+  import {computed, getCurrentInstance} from 'vue'
   import {useStore} from 'vuex'
+  import cookies from 'vue-cookies'
   import MusicList from '../components/MusicList.vue'
   
   const store = useStore()
+  const { proxy } = getCurrentInstance()
+
   const currentIndex = computed(() => {
     return store.state.playingList.currentIdx - 1
   })
@@ -11,11 +14,60 @@
   const tabelData = computed(()=>{
     return store.getters['playingList/allSongs']
   })
+
+  const unableRows = computed(() => {
+    let rows = []
+    for (let i = 0; i < tabelData.value.length; i++) {
+      if (!tabelData.value[i].songurl) {
+        rows.push(i)
+      }
+    }
+    return rows
+  })
+
+  const loginedUsername = computed(()=>{
+      return store.state.user.username
+  })
+
+  const playinglistSongmidsStr = computed(() => {
+    return store.getters['playingList/songmidsStr']
+  })
+
+  function publish(channel, message) {
+    //发送
+    proxy.goEasy.pubsub.publish({
+      channel: channel,
+      message: message,
+      onSuccess:function(){
+          console.log("消息发布成功。")
+      },
+      onFailed: function (error) {
+          console.log("消息发送失败，错误编码："+error.code+" 错误信息："+error.content);
+      }
+    })
+  }
+
+  function synchronous() {
+    if (loginedUsername.value != "") {
+      const data = {
+        "op": 'songmids',
+        "token": cookies.get("token"),
+        "mids": playinglistSongmidsStr.value,
+        "id": store.state.playingList.currentIdx,
+        "playing": store.state.playingList.isPlaying,
+        "progress": store.state.playingList.progressValue
+      }
+      publish(loginedUsername.value, JSON.stringify(data))
+    }
+  }
 </script>
 
 <template>
   <div class="playlist-view">
-    <h2 class="playlist-title">{{'当前列表'}}</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 class="playlist-title">{{'当前列表'}}</h2>
+      <el-icon :size="24" @click="synchronous" color="#e74c3c" style="cursor: pointer;"><i-ep-refresh /></el-icon>
+    </div>
     <div class="playlist-info">
       <span style="font-size:small; color: #cfcfcf;">{{'总'+ tabelData.length +'首'}}</span>
       <span class="clear-button" @click="store.commit('playingList/clearList')">清空列表</span>
@@ -24,6 +76,7 @@
       class="playlist-list" 
       :data="tabelData" 
       :selectRowIndex="currentIndex"
+      :unableRowIndexs="unableRows"
       :showHeader="false" 
       :showIndex="false"
       :showAlbum="false"
@@ -41,7 +94,8 @@
 }
 .playlist-title {
   font-weight: bolder;
-  height: 50px;  
+  height: 50px; 
+  line-height: 50px;
 }
 .playlist-info {
   display: flex;

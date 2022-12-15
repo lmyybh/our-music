@@ -1,6 +1,8 @@
 <script setup lang="ts">
-  import {ref, computed} from 'vue'
+  import {ref, computed, watch, getCurrentInstance} from 'vue'
   import {useStore} from 'vuex'
+  import { ElMessage } from 'element-plus'
+  import cookies from 'vue-cookies'
   import HeaderView from './views/HeaderView.vue'
   import AsideView from './views/AsideView.vue'
   import FooterView from './views/FooterView.vue'
@@ -8,29 +10,44 @@
   import PlayingListView from './views/PlayingListView.vue'
   import {getCookiesReq} from './assets/utils/api'
   
+  const { proxy } = getCurrentInstance()
   const store = useStore()
 
   const loginDialogVisible = ref(true)
   const username = ref('')
   const password = ref('')
 
-  let socket
+  const loginedUsername = computed(()=>{
+      return store.state.user.username
+  })
   
   const showLoginDialog = computed(() => {
-    return !store.state.user.isLogined;
+    return !store.state.user.isLogined
   })
 
   init()
+  
+  // 根据登录的账号确定订阅的 channel
+  watch(loginedUsername, (newUsername, oldUsername) => {
+    if (newUsername == '') {
+      unsubscribe(oldUsername)
+    } else {
+      subscribe(newUsername)
+    }
+  })
 
   async function init() {
     const res = await getCookiesReq()
     if (res) {
       store.dispatch("user/getUserSonglists")
     }
-    //connect()
+    connect()
   }
 
   async function login() {
+    if (username.value == "" || password.value == "") {
+      ElMessage.warning("用户名或密码不能为空")
+    } 
     await store.dispatch("user/login", {username: username.value, password: password.value})
     if (store.state.user.isLogined) {
       username.value = ''
@@ -38,30 +55,86 @@
     }
   }
   
-  // function connect() {
-  //   socket = new WebSocket(import.meta.env.VITE_WEBSOCKET_URL)
-  //   socket.onopen = socketOpen
-  //   socket.onerror = socketError
-  //   socket.onmessage = socketMessage
-  //   socket.onclose = socketClose
-  // }
+  function connect() {
+    proxy.goEasy.connect({
+      onSuccess: function () {  //连接成功
+        console.log("GoEasy connect successfully.") //连接成功
+      },
+      onFailed: function (error) { //连接失败
+        console.log("Failed to connect GoEasy, code:"+error.code+ ",error:"+error.content)
+      },
+      onProgress:function(attempts) { //连接或自动重连中
+        console.log("GoEasy is connecting", attempts)
+      }
+    })
+  }
 
-  // function socketOpen() {
-  //   console.log('open')
-  //   socket.send(store.state.user.username)
-  // }
+  function disconnect() {
+    proxy.goEasy.disconnect({
+        onSuccess: function(){
+            console.log("GoEasy disconnect successfully.")
+        },
+        onFailed: function(error){
+            console.log("Failed to disconnect GoEasy, code:"+error.code+ ",error:"+error.content);
+        }
+    });
+  }
 
-  // function socketError() {
-  //   console.log('error')
-  // }
+  function subscribe(channel) {
+    //订阅消息
+    proxy.goEasy.pubsub.subscribe({
+      channel: channel,//替换为您自己的channel
+      onMessage: function (message) { //收到消息
+        const data = JSON.parse(message.content)
+        if (data.token == cookies.get("token")) {
+          return
+        }
+        console.log(data)
+        switch(data.op) {
+          case "songmids":
+            if (data.mids.length <= 0) {
+              store.commit('playingList/clearList')
+              return
+            }
+            const songmids = data.mids.split(',')
+            store.dispatch('playingList/requestSongsBySongmids', songmids)
+            .then(()=>{
+              store.commit('playingList/selectSong', data.id)
+              store.commit('playingList/needChangeProgress', data.progress)
+              if (data.playing) {
+                store.commit('playingList/toPlay')
+              } else {
+                store.commit('playingList/toPause')
+              }
+            })
+            break
+          default:
+            break
+        }
+      },
+      onSuccess: function () {
+        console.log(`Channel: ${channel} 订阅成功。`)
+      },
+      onFailed: function (error) {
+        console.log(`Channel: ${channel} 订阅失败, 错误编码：` + error.code + " 错误信息：" + error.content)
+      }
+    })
+  }
 
-  // function socketMessage(msg) {
-  //   console.log('message', msg)
-  // }
+  function unsubscribe(channel) {
+    // 取消订阅
+    proxy.goEasy.pubsub.unsubscribe({
+      channel: channel,
+      onSuccess: function () {
+        console.log(`Channel: ${channel} 订阅取消成功。`)
+      },
+      onFailed: function (error) {
+        console.log(`取消 Channel: ${channel} 订阅失败，错误编码：` + error.code + " 错误信息：" + error.content)
+      }
+    })
+  }
 
-  // function socketClose() {
-  //   console.log('close')
-  // }
+  
 </script>
 
 <template>

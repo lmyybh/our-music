@@ -1,6 +1,8 @@
 import MusicList from '../utils/music'
 import { ElMessage } from 'element-plus'
-import { songsUrlsReq } from '../../assets/utils/api'
+import { largeNumberSongsInfoReq, songsUrlsReq } from '../../assets/utils/api'
+
+const MAX_NUM = 100
 
 export default {
     namespaced: true,
@@ -11,6 +13,9 @@ export default {
             wantToPlay: true,
             showPlayingList: false,
             toReload: false,
+            isPlaying: false,
+            progressValue: 0,
+            progressValueToChange: -1, // 用于标识需要把进度条调到哪里, 复数表示不用调
         }
     },
     getters: {
@@ -29,11 +34,16 @@ export default {
         allSongs: (state: any) => {
             const songs = state.musics.getAllSongs()
             return songs
+        },
+        songmidsStr: (state: any) => {
+            const mids = state.musics.list.slice(1, MAX_NUM + 1)
+            return mids.join(',')
         }
     },
 
     mutations: {
         clearList(state: any) {
+            state.currentIdx = 0
             state.musics.clear()
         },
         addSong(state: any, data: any) {
@@ -88,6 +98,18 @@ export default {
         },
         notNeedReload(state: any) {
             state.toReload = false
+        },
+        setIsPlaying(state: any, value: boolean) {
+            state.isPlaying = value
+        },
+        setProgressValue(state: any, value: number) {
+            state.progressValue = value
+        },
+        needChangeProgress(state: any, value: number) {
+            state.progressValueToChange = value
+        },
+        notNeedChangeProgress(state: any) {
+            state.progressValueToChange = -1
         }
     },
     actions: {
@@ -99,19 +121,22 @@ export default {
             let reqSongs = new Map();
             // 存在需要新获取的歌曲时，获取信息
             if (toReqSongmids.length > 0) {
-                const songurls = await songsUrlsReq(toReqSongmids)
+                const songurls: any = await songsUrlsReq(toReqSongmids)
                 if (!songurls || Object.keys(songurls).length <= 0) {
                     ElMessage.error('获取未添加歌曲链接失败')
                     return
-                } else {
-                    let reqSongs = new Map();
-                    for (let i = 0; i < songlists.length; i++) {
-                        let data = songlists[i]
-                        data.songurl = songurls[allSongmids[i]]
-                        reqSongs.set(allSongmids[i], data)
-                    }
-                    commit('replaceSongs', { allSongmids, reqSongs })
+                } else if (Object.keys(songurls).length < toReqSongmids.length) {
+                    ElMessage.error('部分歌曲链接获取失败')
                 }
+
+                let reqSongs = new Map();
+                for (let i = 0; i < songlists.length; i++) {
+                    let data = songlists[i]
+                    data.songurl = songurls[allSongmids[i]]
+                    reqSongs.set(allSongmids[i], data)
+                }
+                commit('replaceSongs', { allSongmids, reqSongs })
+
             } else {
                 // 不存在需要新获取的歌曲时，直接按照顺序改变
                 commit('replaceSongs', { allSongmids, reqSongs })
@@ -131,6 +156,45 @@ export default {
             songs.push(...currentSongs.slice(index + 1, currentSongs.length))
 
             await dispatch("requestSongs", songs)
+        },
+        async requestSongsBySongmids({ commit, state }: any, allSongmids: Array<string>) {
+            const toReqSongmids = state.musics.findNotInMapSongmids(allSongmids)
+            let reqSongs = new Map();
+            if (toReqSongmids.length > 0) {
+                const songinfos: any = await largeNumberSongsInfoReq(toReqSongmids)
+                if (!songinfos || Object.keys(songinfos).length <= 0) {
+                    ElMessage.error('获取未添加歌曲信息失败')
+                    return
+                } else if (Object.keys(songinfos).length < toReqSongmids.length) {
+                    ElMessage.error('部分歌曲信息获取失败')
+                }
+                const songurls: any = await songsUrlsReq(toReqSongmids)
+                if (!songurls || Object.keys(songurls).length <= 0) {
+                    ElMessage.error('获取未添加歌曲链接失败')
+                    return
+                } else if (Object.keys(songurls).length < toReqSongmids.length) {
+                    ElMessage.error('部分歌曲链接获取失败')
+                }
+
+                let reqSongs = new Map();
+                for (let mid of allSongmids) {
+                    let data: any
+                    if (mid in songinfos) {
+                        data = songinfos[mid]
+                        data.songurl = songurls[mid]
+                    } else if (state.musics.has(mid)) {
+                        data = state.musics.getInfoBySongmid(mid)
+                    } else {
+                        continue
+                    }
+                    reqSongs.set(mid, data)
+                }
+                commit('replaceSongs', { allSongmids, reqSongs })
+
+            } else {
+                // 不存在需要新获取的歌曲时，直接按照顺序改变
+                commit('replaceSongs', { allSongmids, reqSongs })
+            }
         }
     }
 }

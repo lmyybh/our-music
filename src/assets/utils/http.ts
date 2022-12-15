@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus'
 
 //axios定义
 axios.defaults.headers['Content-Type'] = 'application/json';
-axios.defaults.timeout = 5000;
+axios.defaults.timeout = 10000;
 //axios.defaults.withCredentials = true;
 
 // http response 拦截器

@@ -1,7 +1,6 @@
 import cookies from 'vue-cookies'
 import { get, post } from './http'
 import { ElMessage } from 'element-plus'
-import store from '@/store';
 
 const BASE_URL = "/api/";
 const MAX_NUM = 50;
@@ -97,6 +96,19 @@ export const songsInfoReq = async (songmids: Array<string>) => {
     }
 
     return data;
+};
+
+export const largeNumberSongsInfoReq = async (songmids: Array<string>) => {
+    let songsData: any = {};
+    let promise = [];
+    for (let i = 0; i < Math.ceil(songmids.length / MAX_NUM); i++) {
+        promise.push(songsInfoReq(songmids.slice(i * MAX_NUM, (i + 1) * MAX_NUM)))
+    }
+    const promiseData = await Promise.all(promise)
+    for (let d of promiseData) {
+        songsData = Object.assign(songsData, d)
+    }
+    return songsData;
 };
 
 export const getUserDetail = async () => {
