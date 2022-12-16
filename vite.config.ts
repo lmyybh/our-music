@@ -41,7 +41,7 @@ export default defineConfig(({ command, mode }) => {
     },
     server: {
       host: '0.0.0.0',
-      port: 8888,
+      port: env.VITE_PORT,
       proxy: {
         '/api': {
           target: env.VITE_API_URL,	//实际请求地址

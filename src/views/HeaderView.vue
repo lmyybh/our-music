@@ -79,7 +79,7 @@
                 <div class="user">
                   <el-avatar
                   :size="30"
-                    src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                    src="https://pic1.zhimg.com/v2-4e330036cbeb7eeda02a6c62f7db52bc_b.jpg"
                   />
                   <span>
                     {{username}}
