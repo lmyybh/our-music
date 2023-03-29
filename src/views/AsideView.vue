@@ -2,7 +2,6 @@
   import {ref, computed, watch, onMounted} from 'vue'
   import {useStore} from 'vuex'
   import { ElMessage } from 'element-plus'
-  import {songInfoReq} from '../assets/utils/api'
 
   const musicInfo = ref(null)
   const store = useStore()
@@ -19,22 +18,13 @@
     if (newMid == '') {
         musicInfo.value = null
     } else {
-        getMusicInfo(newMid)
+        setMusicInfo(newMid)
     }
   })
 
-  async function getMusicInfo(songmid) {
-    const data = await songInfoReq(songmid)
-    if (!data) {
-        musicInfo.value = null
-    } else {
-        musicInfo.value = data
-        if (data.albummid != '') {
-            musicInfo.value.coverSrc = `https://y.gtimg.cn/music/photo_new/T002R300x300M000${data.albummid}.jpg`
-        } else {
-            musicInfo.value.coverSrc = `https://y.qq.com/music/photo_new/T001R300x300M000${data.singermid}.jpg`
-        }
-    }
+  async function setMusicInfo(songmid) {
+    const info = store.getters['playingList/currentInfo']
+    musicInfo.value = info
   }
 </script>
 
@@ -81,11 +71,11 @@
         <div class="music">
             <el-row v-if="musicInfo" align="middle" style="width: 100%; height:100%; margin: 0;">
                 <el-col :span="6" class="cover">
-                    <el-image style="width: 46px; height: 46px" fit="fill" :src="musicInfo.coverSrc" />
+                    <el-image style="width: 46px; height: 46px" fit="fill" :src="musicInfo.pic" />
                 </el-col>
                 <el-col :span="16" class="info">
-                    <span class="music-name">{{musicInfo.songname}}</span>
-                    <span class="author-name">{{musicInfo.singer}}</span>
+                    <span class="music-name">{{musicInfo.name}}</span>
+                    <span class="author-name">{{musicInfo.artist}}</span>
                 </el-col>
                 <el-col :span="2" class="icons">
                     <el-icon :size="14" color="#666666" class="icon-button">

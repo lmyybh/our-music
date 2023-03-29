@@ -2,7 +2,7 @@
   import {ref, watch} from 'vue'
   import { useRoute } from 'vue-router'
   import MusicList from '../components/MusicList.vue'
-  import {searchReq} from '../assets/utils/api.js'
+  import {searchMusicsReq} from '../request/sdk/kuwo/search'
 
   const route = useRoute()
   const tabelData = ref(null)
@@ -16,18 +16,21 @@
     }
   )
 
-  async function search(key, pageNo = 1, pageSize = 100){
+  async function search(key, pn = 1, rn = 50){
     loading.value = true
-    const searchData = await searchReq(key, pageNo, pageSize)
-    convertToTabelData(searchData)
+    const searchData = await searchMusicsReq(key, rn, pn)
+    tabelData.value = getMusicData(searchData)
     loading.value = false
   }
 
-  function convertToTabelData(data) {
-    for (let i=0; i < data.length; i++) {
-        data[i].id = i + 1
+  function getMusicData(data) {
+    let songlist = data.list;
+    for (let i=0; i < songlist.length; i++) {
+      songlist[i].id = i + 1 // 由于默认0位置是空链接，所以后移一位
+      songlist[i].songmid = songlist[i].rid + ''
+      songlist[i].mid = songlist[i].rid + ''
     }
-    tabelData.value = data
+    return songlist
   }
 </script>
 

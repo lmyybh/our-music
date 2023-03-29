@@ -1,7 +1,7 @@
 <script setup>
   import {ref, watch, computed, onMounted} from 'vue'
   import SongList from './SongList.vue'
-  import {getSonglistsReq} from '../assets/utils/api'
+  import {tagMusicListReq} from '../request/sdk/kuwo/musicList'
 
   const props = defineProps({
     col: {
@@ -10,7 +10,7 @@
     },
     title: {
       type: String,
-      default: '热门歌单'
+      default: '经典'
     },
     pageSize: {
       type: Number,
@@ -20,13 +20,9 @@
       type: Number,
       default: 1
     },
-    sort: {
+    id: {
       type: Number,
-      default: 5
-    },
-    category: {
-      type: Number,
-      default: 10000000
+      default: 1265
     }
   })
 
@@ -46,7 +42,7 @@
 
   async function getSongLists(){
     loading.value = true
-    listData.value = await getSonglistsReq(props.pageSize, props.pageNo, props.sort, props.category)
+    listData.value = await tagMusicListReq(props.id, props.pageSize, props.pageNo)
     loading.value = false
   }
 

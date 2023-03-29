@@ -3,18 +3,20 @@
   import SongListContainer from '../components/SongListContainer.vue'
 
   const categories = [
-    {title: '热门歌单', category: 10000000},
-    {title: '华语歌单', category: 165},
-    {title: '粤语歌单', category: 166},
-    {title: '流行歌单', category: 6},
-    {title: 'KTV热歌', category: 141},
+    {title: '经典', id: 1265},
+    {title: 'KTV', id: 361},
+    {title: '情歌', id: 2200},
+    {title: '流行', id: 393},
+    {title: '安静', id: 67},
+    {title: '古风', id: 127},
+    {title: '影视', id: 180},
   ]
 </script>
 
 <template>
 <div class="home-view">
   <div v-for="info of categories">
-    <SongListContainer :title="info.title" :category="info.category" />
+    <SongListContainer :title="info.title" :id="info.id" />
   </div>
 </div>
 </template>

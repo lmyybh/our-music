@@ -1,10 +1,15 @@
-const fields = ['songname', 'singer', 'songmid', 'songurl', 'albumname', 'interval', 'pay_play']
+const fields = ['songmid', 'name', 'songurl', 'artist', 'album', 'songTimeMinutes', 'isListenFee', 'pic']
 
 function formatData(data: any) {
     let info = new Map();
-    for (let f of fields) {
-        info.set(f, data[f]);
-    }
+    info.set('songmid', '' + data.rid)
+    info.set('name', data.name)
+    info.set('songurl', data.songurl)
+    info.set('artist', data.artist)
+    info.set('album', data.album)
+    info.set('songTimeMinutes', data.songTimeMinutes)
+    info.set('isListenFee', data.isListenFee)
+    info.set('pic', data.pic)
     return info;
 }
 
@@ -15,8 +20,8 @@ class MusicList {
         this.map = new Map();
         let emptyValue = new Map();
         for (let f of fields) {
-            if (f == "pay_play") {
-                emptyValue.set(f, 0);
+            if (f == "isListenFee") {
+                emptyValue.set(f, false);
             } else {
                 emptyValue.set(f, '');
             }
@@ -31,8 +36,8 @@ class MusicList {
         this.map = new Map();
         let emptyValue = new Map();
         for (let f of fields) {
-            if (f == "pay_play") {
-                emptyValue.set(f, 0);
+            if (f == "isListenFee") {
+                emptyValue.set(f, false);
             } else {
                 emptyValue.set(f, '');
             }
@@ -47,7 +52,7 @@ class MusicList {
         return this.list.indexOf(songmid)
     }
     insert(index: number, data: any) {
-        const songmid = data.songmid;
+        const songmid = data.rid + '';
         // 查询是否存在
         let idx = this.find(songmid);
 
@@ -76,7 +81,7 @@ class MusicList {
     }
     replace(index: number, data: any) {
         const songmid = this.list[index];
-        const newSongmid = data.songmid;
+        const newSongmid = data.rid + '';
         this.map.delete(songmid);
         this.map.set(newSongmid, formatData(data));
         this.list[index] = newSongmid;

@@ -63,10 +63,10 @@
   })
 
   async function init() {
-    const res = await getCookiesReq()
-    if (res) {
-      store.dispatch("user/getUserSonglists")
-    }
+    // const res = await getCookiesReq()
+    // if (res) {
+    //   store.dispatch("user/getUserSonglists")
+    // }
     connect()
   }
 
@@ -115,7 +115,7 @@
         if (data.token == cookies.get("token")) {
           return
         }
-        console.log(data)
+        
         switch(data.op) {
           case "songmids":
             if (data.mids.length <= 0) {

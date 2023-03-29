@@ -42,19 +42,6 @@ export default {
             if (isOk) {
                 commit("logout")
             }
-        },
-        async getUserSonglists({ commit, state }: any) {
-            let data = await getUserSonglistsReq()
-            if (!data) {
-                ElMessage.error('获取用户歌单信息失败')
-                return
-            }
-
-            data = data.filter((info: any) => {
-                return info.diss_name != "QZone背景音乐" && info.diss_name != "本地上传"
-            })
-
-            commit("setUserSonglists", data)
         }
     }
 }

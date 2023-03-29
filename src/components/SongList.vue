@@ -1,6 +1,6 @@
 <script setup>
   import { useRouter } from 'vue-router'
-  import {getListenNumString} from '../assets/utils/utils'
+
   const props = defineProps({
     data: {
       type: Object,
@@ -13,7 +13,7 @@
   function clickSongList() {
     router.push({ 
       name: 'songlist', 
-      params: { id: props.data.dissid } 
+      params: { id: props.data.id } 
     })
   }
 </script>
@@ -21,12 +21,12 @@
 <template>
   <div class="song-list">
     <div class="song-list-div" @click="clickSongList">
-      <div class="song-list-cover" :style="`background-image: url(${data.imgurl});`">
+      <div class="song-list-cover" :style="`background-image: url(${data.img});`">
         <div style="display: flex; align-items: center; color: white;">
           <el-icon :size="14" style="font-weight: bold;">
             <svg t="1669284617290" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2667" width="200" height="200"><path d="M213.333333 896V128a42.666667 42.666667 0 0 1 65.706667-35.882667l597.333333 384a42.666667 42.666667 0 0 1 0 71.765334l-597.333333 384A42.666667 42.666667 0 0 1 213.333333 896z m85.333334-78.165333L774.4 512 298.666667 206.165333v611.669334z" p-id="2668"></path></svg>
           </el-icon>
-          <span style="font-weight: 400;">{{getListenNumString(data.listennum)}}</span>
+          <span style="font-weight: 400;">{{data.listencnt}}</span>
         </div>
         <el-button circle class="song-list-button" color="#e6e8e8cc">
           <el-icon color="#e83c3c" :size="23">
@@ -34,7 +34,7 @@
           </el-icon>
         </el-button>
       </div>
-      <span class="title-span">{{data.dissname}}</span>
+      <span class="title-span">{{data.name}}</span>
     </div>
   </div>
 </template>

@@ -1,6 +1,6 @@
 import MusicList from '../utils/music'
 import { ElMessage } from 'element-plus'
-import { largeNumberSongsInfoReq, songsUrlsReq } from '../../assets/utils/api'
+import { musicsUrlsReq, getMusicsInfoReq } from '../../request/sdk/kuwo/music'
 
 const MAX_NUM = 100
 
@@ -136,7 +136,7 @@ export default {
             let reqSongs = new Map();
             // 存在需要新获取的歌曲时，获取信息
             if (toReqSongmids.length > 0) {
-                const songurls: any = await songsUrlsReq(toReqSongmids)
+                const songurls: any = await musicsUrlsReq(toReqSongmids)
                 if (!songurls || Object.keys(songurls).length <= 0) {
                     ElMessage.error('获取未添加歌曲链接失败')
                     return
@@ -176,14 +176,14 @@ export default {
             const toReqSongmids = state.musics.findNotInMapSongmids(allSongmids)
             let reqSongs = new Map();
             if (toReqSongmids.length > 0) {
-                const songinfos: any = await largeNumberSongsInfoReq(toReqSongmids)
+                const songinfos: any = await getMusicsInfoReq(toReqSongmids)
                 if (!songinfos || Object.keys(songinfos).length <= 0) {
                     ElMessage.error('获取未添加歌曲信息失败')
                     return
                 } else if (Object.keys(songinfos).length < toReqSongmids.length) {
                     ElMessage.error('部分歌曲信息获取失败')
                 }
-                const songurls: any = await songsUrlsReq(toReqSongmids)
+                const songurls: any = await musicsUrlsReq(toReqSongmids)
                 if (!songurls || Object.keys(songurls).length <= 0) {
                     ElMessage.error('获取未添加歌曲链接失败')
                     return
@@ -212,9 +212,10 @@ export default {
             }
         },
         async playSong({ commit, state }: any, data: any) {
+            console.log(data)
             const songmid: string = data.songmid;
             if (!state.musics.has(songmid)) {
-                const songurls: any = await songsUrlsReq(songmid)
+                const songurls: any = await musicsUrlsReq(songmid)
                 data.songurl = songurls[songmid]
                 commit('addSong', data)
             }
@@ -230,7 +231,7 @@ export default {
             }
 
             if (!state.musics.has(songmid)) {
-                const songurls: any = await songsUrlsReq(songmid)
+                const songurls: any = await musicsUrlsReq(songmid)
                 data.songurl = songurls[songmid]
             } else {
                 data = state.musics.getInfoBySongmid(songmid)

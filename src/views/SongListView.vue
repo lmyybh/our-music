@@ -3,13 +3,12 @@
   import { useRoute } from 'vue-router'
   import {useStore} from 'vuex'
   import { ElMessage } from 'element-plus'
-  import {getSonglistInfoReq, getUserSonglistInfoReq} from '../assets/utils/api'
-  import {getListenNumString} from '../assets/utils/utils'
+  import {getMusicListReq} from '../request/sdk/kuwo/musicList'
   import MusicList from '../components/MusicList.vue'
 
   const loading = ref(false)
   const infoData = ref(null)
-  const tabelData = ref(null)
+  const musicsData = ref(null)
   const route = useRoute()
   const store = useStore()
 
@@ -25,27 +24,35 @@
   async function getSonglistInfo(id){
     loading.value = true
 
-    let data
-    if (route.name == "songlist") {
-      data = await getSonglistInfoReq(id)
-    } else {
-      data = await getUserSonglistInfoReq(id)
-    }
-    
+    let data = await getMusicListReq(id)
     if (Object.keys(data).length > 0) {
-      infoData.value = data.info
-      convertToTabelData(data.songlist)
-    } else {
-      ElMessage.error('请求错误')
+      infoData.value = getInfoData(data)
+      musicsData.value = getMusicData(data)
     }
+
     loading.value = false
   }
 
-  function convertToTabelData(songlist) {
+  function getInfoData(data) {
+    let info = {};
+    info.img = data.img300;
+    info.name = data.name;
+    info.tag = data.tag.split(',');
+    info.userName = data.userName;
+    info.listencnt = data.listencnt;
+    info.info = data.info;
+    info.total = data.total;
+    return info;
+  }
+
+  function getMusicData(data) {
+    let songlist = data.musicList
     for (let i=0; i < songlist.length; i++) {
       songlist[i].id = i + 1 // 由于默认0位置是空链接，所以后移一位
+      songlist[i].songmid = songlist[i].rid + ''
+      songlist[i].mid = songlist[i].rid + ''
     }
-    tabelData.value = songlist
+    return songlist
   }
 
   function getTimeString(stamp) {
@@ -69,7 +76,7 @@
   }
 
   function playAll() {
-    store.dispatch('playingList/requestSongs', tabelData.value)
+    store.dispatch('playingList/requestSongs', musicsData.value)
     .then(()=>{
       store.commit('playingList/selectSong', 1)
       store.commit('playingList/needReload')
@@ -81,7 +88,7 @@
     store.dispatch(
       'playingList/insertSongs', 
       {
-        songlists: tabelData.value, 
+        songlists: musicsData.value, 
         index: store.state.playingList.currentIdx - 1
       }
     ).then(()=>{
@@ -102,19 +109,19 @@
   <div class="song-list-view">
     <div v-if="!loading && infoData != null" class="song-list-content">
       <div class="song-list-info">
-        <img class="cover-image" :src="infoData.logo" />
+        <img class="cover-image" :src="infoData.img" />
         <div class="detail-info">
           <div>
             <div style="display: flex; align-items: center;">
               <div class="song-list-icon">歌单</div>
-              <span class="songlist-title">{{infoData.dissname}}</span>
+              <span class="songlist-title">{{infoData.name}}</span>
             </div>
             <div style="display: flex; align-items: center;">
               <el-icon :size="18">
                 <svg t="1669295062530" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2663" width="200" height="200"><path d="M858.5 763.6c-18.9-44.8-46.1-85-80.6-119.5-34.5-34.5-74.7-61.6-119.5-80.6-0.4-0.2-0.8-0.3-1.2-0.5C719.5 518 760 444.7 760 362c0-137-111-248-248-248S264 225 264 362c0 82.7 40.5 156 102.8 201.1-0.4 0.2-0.8 0.3-1.2 0.5-44.8 18.9-85 46-119.5 80.6-34.5 34.5-61.6 74.7-80.6 119.5C146.9 807.5 137 854 136 901.8c-0.1 4.5 3.5 8.2 8 8.2h60c4.4 0 7.9-3.5 8-7.8 2-77.2 33-149.5 87.8-204.3 56.7-56.7 132-87.9 212.2-87.9s155.5 31.2 212.2 87.9C779 752.7 810 825 812 902.2c0.1 4.4 3.6 7.8 8 7.8h60c4.5 0 8.1-3.7 8-8.2-1-47.8-10.9-94.3-29.5-138.2zM512 534c-45.9 0-89.1-17.9-121.6-50.4S340 407.9 340 362c0-45.9 17.9-89.1 50.4-121.6S466.1 190 512 190s89.1 17.9 121.6 50.4S684 316.1 684 362c0 45.9-17.9 89.1-50.4 121.6S557.9 534 512 534z" p-id="2664"></path></svg>
               </el-icon>
-              <span style="color: #507daf;">{{infoData.nickname}}</span>
-              <span style="margin-left: 10px;">{{getTimeString(infoData.ctime)}} 创建</span>
+              <span style="color: #507daf;">{{infoData.userName}}</span>
+              <!-- <span style="margin-left: 10px;">{{getTimeString(infoData.ctime)}} 创建</span> -->
             </div>
           </div>
           <div>
@@ -133,21 +140,21 @@
           <div>
             <div>
               <span class="info-item">标签 : </span>
-              <span v-for="tag in infoData.tags" style="margin-right: 5px; color:#507daf">{{tag.name}}</span>
+              <span v-for="tag in infoData.tag" style="margin-right: 5px; color:#507daf">{{tag}}</span>
             </div>
             <div>
-              <span class="info-item">歌曲 : <span class="info-content">{{infoData.songnum}}</span></span>
-              <span style="margin-left: 10px;" class="info-item">播放 : <span class="info-content">{{getListenNumString(infoData.visitnum)}}</span></span>
+              <span class="info-item">歌曲 : <span class="info-content">{{infoData.total}}</span></span>
+              <span style="margin-left: 10px;" class="info-item">播放 : <span class="info-content">{{infoData.listencnt}}</span></span>
             </div>
-            <el-popover :content="formatDescription(infoData.desc)" placement="bottom-start" width="500">
+            <el-popover :content="formatDescription(infoData.info)" placement="bottom-start" width="500">
               <template #reference>
-                <span class="info-item overflow-hidden">简介 : <span class="info-content">{{formatDescription(infoData.desc)}}</span></span>
+                <span class="info-item overflow-hidden">简介 : <span class="info-content">{{formatDescription(infoData.info)}}</span></span>
               </template>
             </el-popover>
           </div>
         </div>
       </div>
-      <MusicList :data="tabelData" @right-click="rightClickList" />
+      <MusicList :data="musicsData" @right-click="rightClickList" />
     </div>
     <div v-else v-loading="loading" element-loading-text="载入中" style="display: flex; justify-content: center; margin-top: 200px;">
       <el-alert v-show="!loading" :closable="false" center title="歌单信息加载失败" type="error" style="width: 300px;" />
