@@ -46,6 +46,7 @@ export default defineConfig(({ command, mode }) => {
         '/api': {
           target: env.VITE_API_URL,	//实际请求地址
           changeOrigin: true,
+          secure: false,
           rewrite: (path) => path.replace(/^\/api/, '')
         },
         '/server': {

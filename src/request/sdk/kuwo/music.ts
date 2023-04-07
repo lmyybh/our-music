@@ -2,7 +2,7 @@ import { ElMessage } from 'element-plus'
 import { get } from '../../http'
 import { asyncPoolAll } from '../../async'
 
-const BASE_URL = "/api/";
+const BASE_URL = "/api//";
 
 function urlReq(mid: string, type = 'convert_url3', br = '320kmp3') {
     return get(BASE_URL + 'kuwo/url', { mid: mid, type: type, br: br });
@@ -73,4 +73,9 @@ export const getMusicsInfoReq = async (mids: string | Array<string>) => {
     }
 
     return data;
+};
+
+export const ping = async () => {
+    let res = await get('/api/kuwo/banner', {})
+    console.log(res)
 };

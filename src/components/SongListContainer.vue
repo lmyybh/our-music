@@ -2,7 +2,8 @@
   import {ref, watch, computed, onMounted} from 'vue'
   import SongList from './SongList.vue'
   import {tagMusicListReq} from '../request/sdk/kuwo/musicList'
-
+  import {useStore} from 'vuex'
+  
   const props = defineProps({
     col: {
       type: Number,
@@ -28,16 +29,19 @@
 
   const loading = ref(false)
   const listData = ref([])
+  const store = useStore()
 
   getSongLists()
 
   // 转换为字符串，方便同时监听到变化
   const propsState = computed(()=>{
-    return [props.pageSize, props.pageNo, props.sort, props.category].join()
+    return [props.pageSize, props.pageNo, props.sort, props.category, store.state.user.isLogined].join()
   })
 
   watch(()=>propsState.value, (newState)=>{
-    getSongLists()
+    if (store.state.user.isLogined) {
+      getSongLists()
+    }
   })
 
   async function getSongLists(){

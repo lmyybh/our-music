@@ -13,7 +13,7 @@ export const recommendMusicListReq = async (rn = 1, pn = 5) => {
 
 // 按分类获取歌单信息
 export const tagMusicListReq = async (id = 1265, rn = 20, pn = 1) => {
-    const res: any = await get(BASE_URL + 'kuwo/playList/getTagPlayList', {
+    const res: any = await get(BASE_URL + '/kuwo/playList/getTagPlayList', {
         id: id,
         rn: rn,
         pn: pn
