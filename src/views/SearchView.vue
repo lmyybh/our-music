@@ -1,10 +1,12 @@
 <script setup lang="ts">
   import {ref, watch} from 'vue'
   import { useRoute } from 'vue-router'
+  import {useStore} from 'vuex'
   import MusicList from '../components/MusicList.vue'
   import {searchMusicsReq} from '../request/sdk/kuwo/search'
 
   const route = useRoute()
+  const store = useStore()
   const tabelData = ref(null)
   const loading = ref(false)
   search(route.params.key, route.params.pageNo)
@@ -32,12 +34,20 @@
     }
     return songlist
   }
+
+  function rightClickList({row, event}) {
+    let items = [
+      {'name': '播放', 'callback': ()=>{store.dispatch("playingList/playSong", row)}},
+      //{'name': '下一首播放', 'callback': ()=>{store.dispatch("playingList/nextToPlay", row)}}
+    ]
+    store.commit("menu/changeItems", items)
+  }
 </script>
 
 <template>
 <div class="search-view">
     <h2 class="search-title">{{'搜索 ' + route.params.key}}</h2>
-    <MusicList v-if="!loading" :data="tabelData" />
+    <MusicList v-if="!loading" :data="tabelData" @right-click="rightClickList" />
     <div v-else v-loading="loading" element-loading-text="载入中"></div>
 </div>
 </template>

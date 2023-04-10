@@ -1,10 +1,9 @@
-const fields = ['songmid', 'name', 'songurl', 'artist', 'album', 'songTimeMinutes', 'isListenFee', 'pic']
+const fields = ['songmid', 'name', 'artist', 'album', 'songTimeMinutes', 'isListenFee', 'pic']
 
 function formatData(data: any) {
     let info = new Map();
     info.set('songmid', '' + data.rid)
     info.set('name', data.name)
-    info.set('songurl', data.songurl)
     info.set('artist', data.artist)
     info.set('album', data.album)
     info.set('songTimeMinutes', data.songTimeMinutes)
@@ -120,17 +119,8 @@ class MusicList {
             return Object.fromEntries(data)
         }
     }
-    findNextMusicIndex(index: number) {
-        for (let i = index; i < this.list.length; i++) {
-            let data: any = this.map.get(this.list[i])
-            if (data.get('songurl')) {
-                return i;
-            }
-        }
-        return 0;
-    }
     getAllSongs() {
-        let data = [];
+        let data: any = [];
         for (let i = 1; i < this.list.length; i++) {
             let info = this.getInfo(i);
             info.id = i;

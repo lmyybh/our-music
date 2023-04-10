@@ -1,18 +1,27 @@
 <script setup lang="ts">
-    import {computed} from 'vue'
+    import {ref, watch, computed} from 'vue'
     import { useStore} from 'vuex'
     import {CaretRight} from "@element-plus/icons-vue"
     import ProgressBar from "../components/ProgressBar.vue"
     import MusicPlayer from "../components/MusicPlayer.vue"
+    import { musicsUrlsReq } from '../request/sdk/kuwo/music'
 
     const store = useStore()
-
-    const audioSrc = computed(()=>{
-        return store.getters['playingList/currentUrl']
+    const audioSrc = ref('')
+    
+    const currentSongmid = computed(()=>{
+        return store.getters['playingList/currentSongmid']
     })
 
     const numMusics = computed(()=>{
         return store.getters['playingList/numMusics']
+    })
+
+    watch(currentSongmid, async (newMid, oldMid) => {
+        if (newMid != '') {
+            const data = await musicsUrlsReq(newMid)
+            audioSrc.value = data[newMid]
+        }
     })
 </script>
 

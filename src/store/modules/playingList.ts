@@ -1,6 +1,6 @@
 import MusicList from '../utils/music'
 import { ElMessage } from 'element-plus'
-import { musicsUrlsReq, getMusicsInfoReq } from '../../request/sdk/kuwo/music'
+import { getMusicsInfoReq } from '../../request/sdk/kuwo/music'
 
 const MAX_NUM = 100
 
@@ -75,25 +75,10 @@ export default {
             } else if (idx >= state.musics.length()) {
                 idx = state.musics.length() - 1
             }
-
-            idx = state.musics.findNextMusicIndex(idx);
-            if (idx == 0) {
-                ElMessage.info('从当前位置到播放列表末尾，不存在可播放的歌曲')
-                state.wantToPlay = false
-            }
-
             state.currentIdx = idx
         },
         selectSong(state: any, index: number) {
-            let idx = state.musics.findNextMusicIndex(index);
-            if (idx != index) {
-                ElMessage.info('当前歌曲不可播放，正在寻找下一首歌曲')
-            }
-            if (idx == 0) {
-                ElMessage.info('从当前位置到播放列表末尾，不存在可播放的歌曲')
-                state.wantToPlay = false
-            }
-            state.currentIdx = idx
+            state.currentIdx = index
         },
         replaceSongs(state: any, data: any) {
             const { allSongmids, reqSongs } = data
@@ -132,30 +117,12 @@ export default {
             const allSongmids = songlists.map((song) => {
                 return song.songmid
             })
-            const toReqSongmids = state.musics.findNotInMapSongmids(allSongmids)
+            
             let reqSongs = new Map();
-            // 存在需要新获取的歌曲时，获取信息
-            if (toReqSongmids.length > 0) {
-                const songurls: any = await musicsUrlsReq(toReqSongmids)
-                if (!songurls || Object.keys(songurls).length <= 0) {
-                    ElMessage.error('获取未添加歌曲链接失败')
-                    return
-                } else if (Object.keys(songurls).length < toReqSongmids.length) {
-                    ElMessage.error('部分歌曲链接获取失败')
-                }
-
-                let reqSongs = new Map();
-                for (let i = 0; i < songlists.length; i++) {
-                    let data = songlists[i]
-                    data.songurl = songurls[allSongmids[i]]
-                    reqSongs.set(allSongmids[i], data)
-                }
-                commit('replaceSongs', { allSongmids, reqSongs })
-
-            } else {
-                // 不存在需要新获取的歌曲时，直接按照顺序改变
-                commit('replaceSongs', { allSongmids, reqSongs })
+            for (let i = 0; i < songlists.length; i++) {
+                reqSongs.set(songlists[i].songmid, songlists[i])
             }
+            commit('replaceSongs', { allSongmids, reqSongs })
         },
         async insertSongs({ dispatch, state }: any, data: any) {
             const { songlists, index } = data;
@@ -165,7 +132,7 @@ export default {
                 return !state.musics.has(info.songmid)
             })
 
-            let songs = []
+            let songs: any = []
             songs.push(...currentSongs.slice(0, index + 1))
             songs.push(...toInsertSongs)
             songs.push(...currentSongs.slice(index + 1, currentSongs.length))
@@ -183,20 +150,12 @@ export default {
                 } else if (Object.keys(songinfos).length < toReqSongmids.length) {
                     ElMessage.error('部分歌曲信息获取失败')
                 }
-                const songurls: any = await musicsUrlsReq(toReqSongmids)
-                if (!songurls || Object.keys(songurls).length <= 0) {
-                    ElMessage.error('获取未添加歌曲链接失败')
-                    return
-                } else if (Object.keys(songurls).length < toReqSongmids.length) {
-                    ElMessage.error('部分歌曲链接获取失败')
-                }
 
                 let reqSongs = new Map();
                 for (let mid of allSongmids) {
                     let data: any
                     if (mid in songinfos) {
                         data = songinfos[mid]
-                        data.songurl = songurls[mid]
                     } else if (state.musics.has(mid)) {
                         data = state.musics.getInfoBySongmid(mid)
                     } else {
@@ -212,32 +171,31 @@ export default {
             }
         },
         async playSong({ commit, state }: any, data: any) {
-            console.log(data)
             const songmid: string = data.songmid;
             if (!state.musics.has(songmid)) {
-                const songurls: any = await musicsUrlsReq(songmid)
-                data.songurl = songurls[songmid]
                 commit('addSong', data)
             }
             commit('selectSong', state.musics.find(songmid))
             commit('toPlay')
         },
-        async nextToPlay({ commit, state }: any, data: any) {
-            const songmid: string = data.songmid;
+        // TODO: 未实现下一首歌的逻辑
+        // async nextToPlay({ commit, state }: any, data: any) {
+        //     const songmid: string = data.songmid;
 
-            // 如果正在播放，忽略
-            if (state.musics.getInfo(state.currentIdx).songmid == songmid) {
-                return
-            }
+        //     // 如果正在播放，忽略
+        //     if (state.musics.getInfo(state.currentIdx).songmid == songmid) {
+        //         return
+        //     }
 
-            if (!state.musics.has(songmid)) {
-                const songurls: any = await musicsUrlsReq(songmid)
-                data.songurl = songurls[songmid]
-            } else {
-                data = state.musics.getInfoBySongmid(songmid)
-            }
-            commit('insertSong', { index: state.currentIdx + 1, songdata: data })
-            commit('selectSong', Math.max(1, state.musics.find(songmid) - 1))
-        }
+        //     if (!state.musics.has(songmid)) {
+        //         commit('insertSong', { index: state.currentIdx + 1, songdata: data })
+        //     } else {
+        //         // 交换下一首歌
+        //         const idx = state.music.find(songmid)
+        //         state.musics.list[idx] = state.musics.list[state.currentIdx + 1]
+        //     }
+            
+        //     commit('selectSong', Math.max(1, state.musics.find(songmid) - 1))
+        // }
     }
 }

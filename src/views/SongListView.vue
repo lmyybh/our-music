@@ -99,7 +99,7 @@
   function rightClickList({row, event}) {
     let items = [
       {'name': '播放', 'callback': ()=>{store.dispatch("playingList/playSong", row)}},
-      {'name': '下一首播放', 'callback': ()=>{store.dispatch("playingList/nextToPlay", row)}}
+      //{'name': '下一首播放', 'callback': ()=>{store.dispatch("playingList/nextToPlay", row)}}
     ]
     store.commit("menu/changeItems", items)
   }

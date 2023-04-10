@@ -1,5 +1,5 @@
 <script setup>
-  import {computed, getCurrentInstance} from 'vue'
+  import {ref, computed, getCurrentInstance} from 'vue'
   import {useStore} from 'vuex'
   import cookies from 'vue-cookies'
   import MusicList from '../components/MusicList.vue'
@@ -15,15 +15,7 @@
     return store.getters['playingList/allSongs']
   })
 
-  const unableRows = computed(() => {
-    let rows = []
-    for (let i = 0; i < tabelData.value.length; i++) {
-      if (!tabelData.value[i].songurl) {
-        rows.push(i)
-      }
-    }
-    return rows
-  })
+  const unableRows = ref([]) // 暂时无法判断歌曲是否可以播放
 
   const loginedUsername = computed(()=>{
       return store.state.user.username
