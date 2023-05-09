@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import {ref, watch, computed} from 'vue'
     import { useStore} from 'vuex'
+    import { ElMessage } from 'element-plus'
     import {CaretRight} from "@element-plus/icons-vue"
     import ProgressBar from "../components/ProgressBar.vue"
     import MusicPlayer from "../components/MusicPlayer.vue"
@@ -20,7 +21,15 @@
     watch(currentSongmid, async (newMid, oldMid) => {
         if (newMid != '') {
             const data = await musicsUrlsReq(newMid)
-            audioSrc.value = data[newMid]
+            if (newMid in data) {
+                audioSrc.value = data[newMid]
+            } else {
+                ElMessage.error('获取歌曲链接失败')
+                audioSrc.value = ''
+                store.commit("playingList/cutSong", 1)
+            }
+        } else {
+            audioSrc.value = ''
         }
     })
 </script>
